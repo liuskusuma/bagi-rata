@@ -632,8 +632,13 @@ function onEdit(e) {
 }
 $("content").addEventListener("input", onEdit);
 $("content").addEventListener("change", onEdit);
-// Group titles mirror the name fields; refresh them when the field is left.
-$("content").addEventListener("focusout", e => { if (e.target.dataset.k === "name") render(true); });
+// Group titles mirror the name fields; update them in place so a tap on another button is not lost to a re-render.
+$("content").addEventListener("input", e => {
+  const el = e.target, col = el.dataset.col;
+  if (el.dataset.k !== "name" || (col !== "costs" && col !== "foodItems")) return;
+  const t = el.closest(".group")?.previousElementSibling?.querySelector("span");
+  if (t) t.textContent = el.value || (col === "costs" ? L().cost : L().food);
+});
 
 $("content").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
