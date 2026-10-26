@@ -97,7 +97,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; bo
 .addrow { color: var(--accent); width: 100%; text-align: left; }
 .minus { width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: #fff; flex: 0 0 auto; display: grid; place-items: center; font-weight: 700; line-height: 1; }
 .seg { display: flex; background: color-mix(in srgb, var(--muted) 18%, transparent); border-radius: 9px; padding: 2px; flex: 1 1 auto; }
-.seg button { flex: 1 1 0; font-size: 14px; padding: 6px 8px; border-radius: 7px; color: var(--fg); }
+.seg button { flex: 1 1 0; font-size: 14px; white-space: nowrap; padding: 6px 8px; border-radius: 7px; color: var(--fg); }
 .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 1px 3px rgba(0,0,0,.15); font-weight: 700; }
 .stepper { display: flex; align-items: center; margin-left: auto; background: color-mix(in srgb, var(--muted) 18%, transparent); border-radius: 9px; }
 .stepper button { width: 40px; height: 32px; font-size: 20px; color: var(--accent); }
@@ -187,7 +187,7 @@ const STR = {
     match: "Pertandingan", title: "Judul", vs: "Lawan", optional: "Opsional", timePlace: "Waktu dan tempat", date: "Tanggal", venue: "Tempat", court: "Lapangan",
     start: "Mulai", end: "Selesai", duration: h => `Durasi ${h} jam.`, courts: "Lapangan", length: "Durasi", addCourt: "+ Tambah lapangan", courtN: n => `Lapangan ${n}`,
     courtsNote: (ch, a, b) => `Total ${ch} jam lapangan, ${a}–${b}. Biaya "Per jam" dibagi menurut jam lapangan yang dipakai di tiap jam.`, courtHours: "jam lapangan", crt: "lap", payment: "Pembayaran", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
-    payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
+    payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", payeeMode: "Penerima adalah", fromPlayers: "Pemain", otherName: "Lainnya", payeeOtherName: "Nama penerima", payeeOtherNote: "Penerima bukan pemain, jadi tidak ikut dibagi biaya. Semua pemain ditagih penuh.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
     hoursPlayed: "Jam main", hours: h => `${h} jam`, addPartial: "+ Pemain tidak main full", noName: "(tanpa nama)", del: "Hapus", less: "Kurangi", more: "Tambah",
     partialNote: h => `Semua pemain dianggap main penuh ${h} jam. Tambahkan hanya yang tidak full; dianggap main dari awal.`,
     cost: "Biaya", amount: "Nominal", perHour: "Per jam", equal: "Rata", addCost: "+ Tambah biaya", rounding: "Pembulatan per orang", rNone: "Tidak", rUp: "Ke atas 1rb", rDown: "Ke bawah 1rb", newCost: "Lain-lain",
@@ -208,7 +208,7 @@ const STR = {
     match: "Match", title: "Title", vs: "Opponent", optional: "Optional", timePlace: "Time and place", date: "Date", venue: "Venue", court: "Court",
     start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Courts", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
     courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bank: "Bank account", payee: "Payee", none: "None",
-    payeeNote: "The payee is included in the split but left out of the message.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
+    payeeNote: "The payee is included in the split but left out of the message.", payeeMode: "Payee is", fromPlayers: "A player", otherName: "Other", payeeOtherName: "Payee name", payeeOtherNote: "The payee is not a player, so they are left out of the split. Every player is billed in full.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
     partialNote: h => `Everyone is counted for the full ${h} hours. Add only players who left early; they are counted from the start.`,
     cost: "Cost", amount: "Amount", perHour: "Per hour", equal: "Equal", addCost: "+ Add cost", rounding: "Rounding per person", rNone: "None", rUp: "Up to 1k", rDown: "Down to 1k", newCost: "Other",
@@ -300,7 +300,7 @@ const KEY = "bagi-rata-iphone-v2", PKEY = "bagi-rata-iphone-prefs";
 const SAMPLE = () => ({
   title: "", vs: "", date: "", venue: "",
   courts: [{ id: "k1", name: "Lapangan 1", start: "", hours: 2 }],
-  bank: "", round: "1000", payer: "",
+  bank: "", round: "1000", payer: "", payerMode: "player", payerName: "",
   costs: [
     { id: "c1", name: "Lapangan", amount: 0, split: "hours" },
     { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
@@ -361,6 +361,7 @@ function clock(offset) {
   const t = ((Math.round(first + offset * 60) % 1440) + 1440) % 1440;
   return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
 }
+const PID = () => S.payerMode === "other" ? "" : S.payer;
 const hoursOf = p => { const x = S.partial.find(q => q.player === p.id); return x ? +x.hours || 0 : fullHours(); };
 const hasHourly = () => S.costs.some(c => c.split === "hours");
 
@@ -403,7 +404,7 @@ function compute() {
     r.final = S.round === "1000" ? Math.ceil(raw / 1000) * 1000 : S.round === "down1000" ? Math.floor(raw / 1000) * 1000 : raw;
   }
   const allShares = rows.reduce((a, r) => a + r.final, 0);
-  const collected = rows.reduce((a, r) => a + (r.p.id === S.payer ? 0 : r.final), 0);
+  const collected = rows.reduce((a, r) => a + (r.p.id === PID() ? 0 : r.final), 0);
   return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, segs, CH };
 }
 function buildMessage(res) {
@@ -415,7 +416,7 @@ function buildMessage(res) {
   const sameTime = sp.list.every(x => x.a === sp.list[0].a && x.b === sp.list[0].b);
   if (sameTime) {
     const names = S.courts.map(c => c.name).filter(Boolean).join(", ");
-    const place = [S.venue, names ? `(${names})` : ""].filter(Boolean).join(" ");
+    const place = S.venue ? [S.venue, names ? `(${names})` : ""].filter(Boolean).join(" ") : names;
     if (place) lines.push("📍" + place);
     if (S.courts.some(c => c.start)) lines.push(`${sessionStart()}-${sessionEnd()}`);
   } else {
@@ -423,7 +424,7 @@ function buildMessage(res) {
     for (const x of sp.list) lines.push(`${x.c.name}: ${clock(x.a)}-${clock(x.b)}`);
   }
   lines.push("");
-  for (const r of res.rows) if (r.p.name && r.p.id !== S.payer) lines.push(`${r.p.name} - ${rb(r.final)}`);
+  for (const r of res.rows) if (r.p.name && r.p.id !== PID()) lines.push(`${r.p.name} - ${rb(r.final)}`);
   if (S.bank) lines.push("", S.bank);
   return lines.join("\n");
 }
@@ -470,11 +471,14 @@ function viewSesi(T) {
     <div class="group-title">${T.payment}</div>
     <div class="group">
       <div class="row"><label for="s-bank">${T.bank}</label><input id="s-bank" data-s="bank" value="${esc(S.bank)}"></div>
-      <div class="row"><label for="s-payer">${T.payee}</label><select id="s-payer" data-s="payer">
+      <div class="row"><span class="lbl">${T.payeeMode}</span>${seg('data-s="payerMode" data-re', S.payerMode === "other" ? "other" : "player", [["player", T.fromPlayers], ["other", T.otherName]])}</div>
+      ${S.payerMode === "other"
+        ? `<div class="row"><label for="s-payer-name">${T.payee}</label><input id="s-payer-name" data-s="payerName" value="${esc(S.payerName)}" placeholder="${T.payeeOtherName}"></div>`
+        : `<div class="row"><label for="s-payer">${T.payee}</label><select id="s-payer" data-s="payer" data-re>
         <option value="">${T.none}</option>${S.players.map(p => `<option value="${p.id}"${p.id === S.payer ? " selected" : ""}>${pname(p)}</option>`).join("")}
-      </select></div>
+      </select></div>`}
     </div>
-    <p class="foot">${T.payeeNote}</p>`;
+    <p class="foot">${S.payerMode === "other" ? T.payeeOtherNote : T.payeeNote}</p>`;
 }
 
 function viewPemain(T) {
@@ -484,7 +488,7 @@ function viewPemain(T) {
     <div class="group">
       ${S.players.map(p => `<div class="row"><button type="button" class="minus" data-del-player="${p.id}" aria-label="${T.del} ${esc(p.name)}">−</button>
         <input class="left" aria-label="${T.name}" data-col="players" data-id="${p.id}" data-k="name" value="${esc(p.name)}" placeholder="${T.name}">
-        ${p.id === S.payer ? `<span class="tag">${T.payeeTag}</span>` : ""}</div>`).join("")}
+        ${p.id === PID() ? `<span class="tag">${T.payeeTag}</span>` : ""}</div>`).join("")}
       <div class="row"><button type="button" class="addrow" id="add-player">${T.addPlayer}</button></div>
     </div>
     ${hasHourly() ? `
@@ -560,7 +564,7 @@ function viewTagihan(T) {
     <div class="group-title">${T.perPlayer}</div>
     <div class="group">
       ${res.rows.map(r => `<button type="button" class="row person" data-open="${r.p.id}" aria-expanded="${open === r.p.id}">
-          <span class="name">${pname(r.p)}${r.p.id === S.payer ? `<span class="tag">${T.payeeTag}</span>` : ""}</span>
+          <span class="name">${pname(r.p)}${r.p.id === PID() ? `<span class="tag">${T.payeeTag}</span>` : ""}</span>
           <span class="amt">${rb(r.final)}</span><span class="chev">›</span></button>
         ${open === r.p.id ? `<div class="explain">${explainHtml(T, res, r)}</div>` : ""}`).join("")}
     </div>
@@ -610,7 +614,7 @@ function render(keepScroll) {
 function renderSummary() {
   const res = compute();
   $("summary").hidden = tab === "tagihan";
-  $("summary").innerHTML = `<span>${L().billing(res.rows.length - (S.payer ? 1 : 0))}</span><b>${rp(res.collected)} ›</b>`;
+  $("summary").innerHTML = `<span>${L().billing(res.rows.length - (PID() ? 1 : 0))}</span><b>${rp(res.collected)} ›</b>`;
   save();
 }
 function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
@@ -694,7 +698,7 @@ window.claude?.hot?.snapshot?.(() => ({ S: JSON.parse(JSON.stringify(S)), P: Obj
 const boot = data => {
   if (data && data.S) { S = data.S; tab = data.tab || tab; }
   if (data && data.P) P = Object.assign(P, data.P);
-  migrateCourts(); dropCovered(); applyCourt(); render();
+  migrateCourts(); dropCovered(); if (!S.payerMode) { S.payerMode = "player"; S.payerName = S.payerName || ""; } applyCourt(); render();
 };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 </script>
