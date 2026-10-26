@@ -1,0 +1,559 @@
+<title>Bagi Rata Tenis</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: two columns on desktop, inputs left and a sticky WhatsApp preview right; one column on phones. Hard-court blue with a ball-yellow accent. */
+:root {
+  --bg: #eef2f6;
+  --surface: #ffffff;
+  --fg: #14202e;
+  --muted: #5b6b7d;
+  --line: #d3dce6;
+  --court: #1f5a8c;
+  --court-ink: #ffffff;
+  --ball: #d6e83a;
+  --ball-ink: #1b2410;
+  --warn: #b4540a;
+  --ok: #2f7d43;
+  --wa: #e7f6dd;
+  --wa-ink: #111b21;
+  --f-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "Barlow", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1520; --surface: #152232; --fg: #e5ecf3; --muted: #93a4b7; --line: #2a3b50;
+  --court: #2f74b0; --court-ink: #ffffff; --ball: #d6e83a; --ball-ink: #1b2410;
+  --warn: #f0a050; --ok: #6cc985; --wa: #1f3326; --wa-ink: #e6f0e8; color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0d1520; --surface: #152232; --fg: #e5ecf3; --muted: #93a4b7; --line: #2a3b50;
+  --court: #2f74b0; --court-ink: #ffffff; --ball: #d6e83a; --ball-ink: #1b2410;
+  --warn: #f0a050; --ok: #6cc985; --wa: #1f3326; --wa-ink: #e6f0e8; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 18px; }
+h1 { font-family: var(--f-display); font-size: 2.2rem; letter-spacing: .01em; margin: 0; text-transform: uppercase; line-height: 1; }
+h1 span { background: var(--ball); color: var(--ball-ink); padding: 0 .2em; }
+.sub { color: var(--muted); margin: 0; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.col { display: grid; gap: 16px; min-width: 0; }
+section.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+h2 { font-family: var(--f-display); text-transform: uppercase; letter-spacing: .06em; font-size: 1.05rem; margin: 0 0 12px; color: var(--court); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+:root:not([data-theme="light"]) h2 { color: var(--fg); }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 12px; }
+label { display: grid; gap: 4px; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+input, select { font: inherit; font-size: .95rem; text-transform: none; letter-spacing: 0; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--court); outline-offset: 1px; }
+input.num { font-family: var(--f-mono); font-size: .88rem; text-align: right; }
+.wide { grid-column: 1 / -1; }
+.tablebox { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+th { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); text-align: left; font-weight: 600; padding: 4px 6px; white-space: nowrap; }
+td { padding: 4px 6px; border-top: 1px solid var(--line); vertical-align: middle; }
+td input { padding: 5px 7px; }
+.p-name { min-width: 110px; }
+.p-num { width: 84px; }
+.p-food { width: 96px; }
+.food-item { padding: 10px 0; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.food-item:first-child { border-top: 0; padding-top: 0; }
+.food-top { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, .9fr) auto; gap: 8px; align-items: center; }
+@media (max-width: 480px) { .food-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; } .food-top input[data-k="name"] { grid-column: 1 / -1; } }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who-chip { font-size: .82rem; font-weight: 500; padding: 4px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); }
+.who-chip[aria-pressed="true"] { background: var(--court); border-color: var(--court); color: var(--court-ink); font-weight: 600; }
+button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 6px 12px; font-weight: 600; }
+button:hover { border-color: var(--court); }
+button.x { border: 0; background: none; color: var(--muted); padding: 4px 8px; font-size: 1.1rem; line-height: 1; }
+button.x:hover { color: var(--warn); }
+button.add { font-size: .85rem; }
+.btn-main { background: var(--court); color: var(--court-ink); border-color: var(--court); }
+.btn-ball { background: var(--ball); color: var(--ball-ink); border-color: var(--ball); }
+a.btn-ball { display: inline-block; text-decoration: none; border-radius: 6px; padding: 6px 12px; font-weight: 600; }
+.covered { display: flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); padding: 0 4px; min-width: 0; }
+.covered:focus-within { outline: 2px solid var(--court); outline-offset: 1px; }
+.covered input { border: 0; background: transparent; padding: 7px 4px; flex: 1 1 0; }
+.covered input:focus-visible { outline: none; }
+.covered span { color: var(--muted); font-size: .8rem; }
+.cost-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line); }
+.cost-row:first-of-type, .cost-head + .cost-row { border-top: 0; }
+.cost-head { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; padding-bottom: 0; }
+@media (max-width: 640px) { .cost-head { display: none; } }
+@media (max-width: 640px) { .cost-row { grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; } .cost-row .split { grid-column: 1 / 3; } }
+.hint { font-size: .82rem; color: var(--muted); margin: 8px 0 0; }
+.preview { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); }
+.bubble { background: var(--wa); color: var(--wa-ink); border-radius: 10px 10px 10px 2px; padding: 12px 14px; white-space: pre-wrap; font-family: var(--f-body); font-size: .95rem; line-height: 1.4; overflow-wrap: anywhere; margin: 0; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+.status { font-size: .85rem; color: var(--ok); }
+.totals { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-variant-numeric: tabular-nums; margin-top: 14px; font-size: .9rem; }
+.totals dt { color: var(--muted); }
+.totals dd { margin: 0; text-align: right; font-family: var(--f-mono); font-size: .85rem; }
+.totals .strong { color: var(--fg); font-weight: 600; }
+.chip { display: inline-block; font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 2px 8px; border-radius: 99px; }
+.chip.ok { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+.chip.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+.breakdown td, .breakdown th { font-size: .82rem; }
+.breakdown td.n { text-align: right; font-family: var(--f-mono); font-size: .78rem; white-space: nowrap; }
+.example { font-size: .8rem; background: color-mix(in srgb, var(--ball) 30%, transparent); color: var(--fg); border-radius: 6px; padding: 8px 10px; margin: 0 0 16px; }
+.check { display: flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: .9rem; color: var(--fg); font-weight: 500; }
+.check input { width: auto; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Bagi <span>Rata</span></h1>
+    <p class="sub">Hitung patungan lapangan, ballboy, dan lain-lain, lalu kirim ke grup WhatsApp.</p>
+  </header>
+  <p class="example">Data contoh: COS Match #4, 17 Oct. Semua isian tersimpan otomatis di browser ini.</p>
+
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <h2>Sesi</h2>
+        <div class="fields">
+          <label class="wide">Judul<input id="f-title"></label>
+          <label>Lawan (opsional)<input id="f-vs"></label>
+          <label>Tanggal<input id="f-date" type="date"></label>
+          <label>Tempat<input id="f-venue"></label>
+          <label>Lapangan<input id="f-court"></label>
+          <label>Mulai<input id="f-start" type="time"></label>
+          <label>Selesai<input id="f-end" type="time"></label>
+          <label class="wide">Rekening<input id="f-bank"></label>
+          <label class="wide">Penerima transfer (ikut dihitung, tidak masuk pesan)<select id="f-payer"></select></label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Pemain <button class="add" id="add-player" type="button">+ Pemain</button></h2>
+        <div id="players" class="name-list"></div>
+      </section>
+
+      <section class="card">
+        <h2>Biaya <button class="add" id="add-cost" type="button">+ Biaya</button></h2>
+        <div id="costs"></div>
+        <p class="hint"><b>Per jam</b>: dibagi sesuai jam main tiap pemain. <b>Rata</b>: sama untuk semua pemain.</p>
+        <div class="fields" style="margin-top:12px">
+          <label>Pembulatan
+            <select id="f-round">
+              <option value="0">Tidak dibulatkan</option>
+              <option value="1000">Ke atas, kelipatan 1.000</option>
+              <option value="down1000">Ke bawah, kelipatan 1.000</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card" id="hours-card">
+        <h2>Jam main <button class="add" id="add-partial" type="button">+ Pemain tidak full</button></h2>
+        <p class="hint" id="hours-note" style="margin:0 0 8px"></p>
+        <div id="partials"></div>
+      </section>
+
+      <section class="card">
+        <h2>Makanan
+          <label class="check"><input type="checkbox" id="f-food"> Ada pembagian makanan</label>
+        </h2>
+        <div id="food-body">
+          <div id="food"></div>
+          <button class="add" id="add-food" type="button" style="margin-top:10px">+ Makanan</button>
+          <p class="hint">Klik nama untuk memilih siapa yang ditagih. <b>Per orang</b>: tiap orang yang dipilih bayar harga penuh. <b>Dibagi</b>: harganya dibagi rata ke orang yang dipilih, misalnya satu pizza untuk bertiga.</p>
+        </div>
+        <p class="hint" id="food-off" style="margin:0">Makanan tidak dimasukkan ke tagihan.</p>
+      </section>
+    </div>
+
+    <div class="col preview">
+      <section class="card">
+        <h2>Pesan WhatsApp <span id="balance-chip"></span></h2>
+        <pre class="bubble" id="msg"></pre>
+        <div class="actions">
+          <button class="btn-main" id="copy" type="button">Salin pesan</button>
+          <a class="btn-ball" id="wa" href="#" target="_blank" rel="noopener">Buka di WhatsApp</a>
+          <span class="status" id="status" aria-live="polite"></span>
+        </div>
+        <dl class="totals" id="totals"></dl>
+      </section>
+      <section class="card">
+        <h2>Rincian per pemain</h2>
+        <div class="tablebox"><table class="breakdown" id="breakdown"></table></div>
+      </section>
+      <section class="card">
+        <h2>Cara hitung</h2>
+        <label>Pemain<select id="explain-player"></select></label>
+        <ul class="explain" id="explain"></ul>
+      </section>
+      <button id="reset" type="button" style="justify-self:start">Isi ulang dengan data contoh</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.name-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.name-row, .partial-row { display: flex; gap: 4px; align-items: center; min-width: 0; }
+.partial-row { padding: 6px 0; border-top: 1px solid var(--line); gap: 8px; }
+.partial-row:first-child { border-top: 0; }
+.partial-row select { flex: 1 1 auto; }
+.partial-row input { flex: 0 0 90px; }
+.partial-row span { color: var(--muted); font-size: .85rem; }
+h2 .check { font-family: var(--f-body); }
+.explain { margin: 10px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: .88rem; }
+.explain .f { font-family: var(--f-mono); font-size: .8rem; color: var(--muted); display: block; overflow-wrap: anywhere; }
+</style>
+
+<script>
+const KEY = "bagi-rata-v5";
+const SAMPLE = () => ({
+  title: "COS Match #4 (Home)", vs: "TDP", date: "2026-10-17", venue: "Nordic Ancol", court: "Lapangan 2",
+  start: "18:00", end: "22:00", bank: "BCA 6300102008 a/n Winarto Kusuma", round: "1000", payer: "p0",
+  costs: [
+    { id: "c1", name: "Lapangan", amount: 613000, split: "hours" },
+    { id: "c2", name: "Ball boy", amount: 100000, split: "equal" },
+    { id: "c3", name: "Bola baru", amount: 110000, split: "equal" }
+  ],
+  players: [
+    { id: "p0", name: "Lius" }, { id: "p1", name: "Adrian" }, { id: "p2", name: "Ivan" }, { id: "p3", name: "Jonsen" },
+    { id: "p4", name: "KP" }, { id: "p5", name: "Delix" }, { id: "p6", name: "Gebe" }
+  ],
+  partial: [],
+  foodOn: true,
+  foodItems: [
+    { id: "f1", name: "Nasi + lauk spesial", price: 108000, mode: "each", who: ["p5"] },
+    { id: "f2", name: "Nasi + lauk", price: 80000, mode: "each", who: ["p0", "p1", "p2"] },
+    { id: "f3", name: "Minuman", price: 26000, mode: "each", who: ["p0", "p1", "p2", "p5", "p6"] }
+  ]
+});
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) || SAMPLE(); } catch (e) { S = SAMPLE(); }
+// Older saves kept one food total per player; turn each into its own item.
+// "Ditanggung" was removed for now; fold any saved covered amount into the cost itself.
+function dropCovered() {
+  for (const c of S.costs) if (c.covered !== undefined) { c.amount = Math.max(0, (+c.amount || 0) - (+c.covered || 0)); delete c.covered; delete c.coveredBy; }
+}
+function migrate() {
+  if (S.foodItems) return;
+  S.foodItems = Object.entries(S.food || {}).filter(([, v]) => +v)
+    .map(([pid, v]) => ({ id: uid("f"), name: "Pesanan", price: +v, mode: "each", who: [pid] }));
+  delete S.food;
+}
+if (!["0", "1000", "down1000"].includes(S.round)) S.round = "1000";
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const uid = p => p + Math.random().toString(36).slice(2, 8);
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rp = n => "Rp " + Math.round(n).toLocaleString("id-ID");
+const rb = n => { const k = Math.round(n) / 1000; return (Number.isInteger(k) ? k : +k.toFixed(1)) + "rb"; };
+// Rupiah amounts are whole numbers; dots and commas are thousand separators ("600.000").
+const num = v => +String(v).replace(/\D/g, "") || 0;
+const money = v => (+v ? (+v).toLocaleString("id-ID") : "");
+// Money fields format thousands while typing (600000 shows as 600.000); runs before the field handlers.
+document.addEventListener("input", e => {
+  const el = e.target; if (!el.classList || !el.classList.contains("money")) return;
+  const pos = el.selectionStart ?? el.value.length;
+  const digitsRight = el.value.slice(pos).replace(/\D/g, "").length;
+  el.value = money(num(el.value));
+  let i = el.value.length, seen = 0;
+  while (i > 0 && seen < digitsRight) { i--; if (/\d/.test(el.value[i])) seen++; }
+  try { el.setSelectionRange(i, i); } catch (err) {}
+}, true);
+
+const HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const BULAN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function dateLine(v) {
+  if (!v) return "";
+  const [y, m, d] = v.split("-").map(Number);
+  return `${HARI[new Date(y, m - 1, d).getDay()]}, ${d} ${BULAN[m - 1]}`;
+}
+// Session length in hours from the start/end times; wraps past midnight.
+function fullHours() {
+  if (!S.start || !S.end) return 0;
+  const t = s => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
+  let d = t(S.end) - t(S.start); if (d <= 0) d += 1440;
+  return d / 60;
+}
+const hoursOf = p => { const x = S.partial.find(q => q.player === p.id); return x ? +x.hours || 0 : fullHours(); };
+const hasHourly = () => S.costs.some(c => c.split === "hours");
+
+function compute() {
+  const ps = S.players;
+  const totalHours = ps.reduce((a, p) => a + hoursOf(p), 0);
+  const rows = ps.map(p => ({ p, parts: {}, food: 0, foodLines: [] }));
+  if (S.foodOn) for (const f of S.foodItems) {
+    const who = f.who.filter(id => ps.some(p => p.id === id)); if (!who.length) continue;
+    const each = f.mode === "split" ? (+f.price || 0) / who.length : +f.price || 0;
+    for (const r of rows) if (who.includes(r.p.id)) {
+      r.food += each;
+      r.foodLines.push(f.mode === "split" ? `${f.name}: ${Math.round(+f.price || 0).toLocaleString("id-ID")} ÷ ${who.length} orang = ${Math.round(each).toLocaleString("id-ID")}` : `${f.name}: ${Math.round(each).toLocaleString("id-ID")}`);
+    }
+  }
+  // Per-hour items: the session is cut into time segments (players who leave early are assumed to
+  // play from the start), each segment's cost is split among the players on court during it.
+  const H = fullHours();
+  const hs = rows.map(r => Math.min(hoursOf(r.p), H));
+  const pts = [...new Set([0, H, ...hs])].filter(x => x >= 0 && x <= H).sort((a, b) => a - b);
+  const segs = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1], present = rows.map((r, j) => j).filter(j => hs[j] > a);
+    if (present.length) segs.push({ a, b, present });
+  }
+  let costTotal = 0;
+  for (const c of S.costs) {
+    const amt = Math.max(0, (+c.amount || 0) - (+c.covered || 0)); costTotal += amt;
+    rows.forEach(r => r.parts[c.id] = 0);
+    if (c.split === "hours" && H > 0) {
+      for (const s of segs) for (const j of s.present) rows[j].parts[c.id] += amt * (s.b - s.a) / H / s.present.length;
+    } else for (const r of rows) r.parts[c.id] = ps.length ? amt / ps.length : 0;
+  }
+  const foodTotal = rows.reduce((a, r) => a + r.food, 0);
+  costTotal += foodTotal;
+  for (const r of rows) {
+    const raw = Math.round(Object.values(r.parts).reduce((a, b) => a + b, 0) + r.food);
+    r.final = S.round === "1000" ? Math.ceil(raw / 1000) * 1000
+      : S.round === "down1000" ? Math.floor(raw / 1000) * 1000 : raw;
+  }
+  const allShares = rows.reduce((a, r) => a + r.final, 0);
+  const collected = rows.reduce((a, r) => a + (r.p.id === S.payer ? 0 : r.final), 0);
+  return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, totalHours, segs };
+}
+
+function buildMessage(res) {
+  const lines = [S.title];
+  if (S.vs) lines.push("", "VS " + S.vs);
+  lines.push("");
+  const dl = dateLine(S.date); if (dl) lines.push(dl);
+  const place = [S.venue, S.court ? `(${S.court})` : ""].filter(Boolean).join(" ");
+  if (place) lines.push("📍" + place);
+  if (S.start || S.end) lines.push(`${S.start}-${S.end}`);
+  lines.push("");
+  for (const r of res.rows) if (r.p.name && r.p.id !== S.payer) lines.push(`${r.p.name} - ${rb(r.final)}`);
+  if (S.bank) lines.push("", S.bank);
+  return lines.join("\n");
+}
+
+function renderPayer() {
+  $("f-payer").innerHTML = `<option value="">Tidak ada (semua masuk pesan)</option>` +
+    S.players.map(p => `<option value="${p.id}"${p.id === S.payer ? " selected" : ""}>${esc(p.name || "(tanpa nama)")}</option>`).join("");
+}
+function renderPlayers() {
+  $("players").innerHTML = S.players.map(p => `
+    <div class="name-row" data-id="${p.id}">
+      <input aria-label="Nama pemain" value="${esc(p.name)}" placeholder="Nama">
+      <button class="x" type="button" data-del aria-label="Hapus pemain">×</button>
+    </div>`).join("");
+}
+function renderCosts() {
+  $("costs").innerHTML = `<div class="cost-row cost-head"><span>Nama</span><span>Nominal (Rp)</span><span>Cara bagi</span><span></span></div>` + S.costs.map(c => `
+    <div class="cost-row" data-id="${c.id}">
+      <input aria-label="Nama biaya" data-k="name" value="${esc(c.name)}">
+      <input aria-label="Nominal" class="num money" data-k="amount" inputmode="numeric" value="${money(c.amount)}" placeholder="Nominal">
+      <select aria-label="Cara bagi" class="split" data-k="split">
+        <option value="hours"${c.split === "hours" ? " selected" : ""}>Per jam</option>
+        <option value="equal"${c.split === "equal" ? " selected" : ""}>Rata</option>
+      </select>
+      <button class="x" type="button" data-del aria-label="Hapus biaya">×</button>
+    </div>`).join("");
+}
+function renderPartials() {
+  $("hours-card").hidden = !hasHourly();
+  const fh = fullHours();
+  $("hours-note").textContent = `Semua pemain dianggap main penuh ${fh} jam (${S.start || "?"}-${S.end || "?"}). Tambahkan hanya yang tidak main penuh. Biaya tiap jam dibagi ke pemain yang ada di jam itu, dan yang tidak full dianggap main dari awal.`;
+  S.partial = S.partial.filter(q => S.players.some(p => p.id === q.player));
+  $("partials").innerHTML = S.partial.map((q, i) => {
+    const taken = S.partial.filter((x, j) => j !== i).map(x => x.player);
+    const opts = S.players.filter(p => !taken.includes(p.id))
+      .map(p => `<option value="${p.id}"${p.id === q.player ? " selected" : ""}>${esc(p.name || "(tanpa nama)")}</option>`).join("");
+    return `<div class="partial-row" data-i="${i}">
+      <select aria-label="Pemain" data-k="player">${opts}</select>
+      <input aria-label="Jam main" class="num" data-k="hours" type="number" min="0" step="0.5" value="${q.hours}"><span>jam</span>
+      <button class="x" type="button" data-del aria-label="Hapus">×</button>
+    </div>`;
+  }).join("");
+  $("add-partial").disabled = S.partial.length >= S.players.length;
+}
+function renderFood() {
+  $("f-food").checked = !!S.foodOn;
+  $("food-body").hidden = !S.foodOn;
+  $("food-off").hidden = !!S.foodOn;
+  $("food").innerHTML = S.foodItems.map(f => `
+    <div class="food-item" data-id="${f.id}">
+      <div class="food-top">
+        <input aria-label="Nama makanan" data-k="name" value="${esc(f.name)}" placeholder="Nama makanan">
+        <input aria-label="Harga (Rp)" class="num money" data-k="price" inputmode="numeric" value="${money(f.price)}" placeholder="Harga">
+        <select aria-label="Cara bagi makanan" data-k="mode">
+          <option value="each"${f.mode === "each" ? " selected" : ""}>Per orang</option>
+          <option value="split"${f.mode === "split" ? " selected" : ""}>Dibagi</option>
+        </select>
+        <button class="x" type="button" data-del aria-label="Hapus makanan">×</button>
+      </div>
+      <div class="who">${S.players.map(p => `<button type="button" class="who-chip" data-p="${p.id}" aria-pressed="${f.who.includes(p.id)}">${esc(p.name || "(tanpa nama)")}</button>`).join("")}</div>
+    </div>`).join("") || `<p class="hint" style="margin:0">Belum ada makanan. Klik "+ Makanan" untuk menambah.</p>`;
+}
+
+function renderOutput() {
+  const res = compute();
+  const msg = buildMessage(res);
+  $("msg").textContent = msg;
+  $("wa").href = "https://wa.me/?text=" + encodeURIComponent(msg);
+  const diff = res.allShares - res.costTotal;
+  $("balance-chip").innerHTML = Math.abs(diff) < 1
+    ? '<span class="chip ok">Pas</span>'
+    : diff > 0 ? `<span class="chip ok">Lebih ${rb(diff)}</span>` : `<span class="chip warn">Kurang ${rb(-diff)}</span>`;
+  $("totals").innerHTML = S.costs.map(c => {
+    const v = Math.max(0, (+c.amount || 0) - (+c.covered || 0));
+    const note = c.covered ? ` <small>(${rp(c.covered)} ditanggung${c.coveredBy ? " " + esc(c.coveredBy) : ""})</small>` : "";
+    return `<dt>${esc(c.name)}${note}</dt><dd>${rp(v)}</dd>`;
+  }).join("") + (S.foodOn ? `<dt>Makanan</dt><dd>${rp(res.foodTotal)}</dd>` : "") +
+    `<dt class="strong">Total biaya</dt><dd class="strong">${rp(res.costTotal)}</dd>
+    <dt class="strong">Total dari semua pemain</dt><dd class="strong">${rp(res.allShares)}</dd>
+    <dt>Ditagih lewat pesan</dt><dd>${rp(res.collected)}</dd>
+    <dt>Bagian penerima sendiri</dt><dd>${rp(res.payerShare)}</dd>`;
+  const cols = S.costs.map(c => c.name).concat(S.foodOn ? ["Makanan"] : []);
+  $("breakdown").innerHTML = `<tr><th>Pemain</th>${hasHourly() ? '<th style="text-align:right">Jam</th>' : ""}${cols.map(n => `<th style="text-align:right">${esc(n)}</th>`).join("")}<th style="text-align:right">Tagihan</th></tr>` +
+    res.rows.map(r => `<tr><td>${esc(r.p.name)}${r.p.id === S.payer ? " (penerima)" : ""}</td>${hasHourly() ? `<td class="n">${hoursOf(r.p)}</td>` : ""}${S.costs.map(c => `<td class="n">${rb(r.parts[c.id])}</td>`).join("")}${S.foodOn ? `<td class="n">${r.food ? rb(r.food) : "-"}</td>` : ""}<td class="n"><b>${rb(r.final)}</b></td></tr>`).join("");
+  renderExplain(res);
+  save();
+}
+
+let explainId = null;
+function clock(offset) {
+  const [h, m] = (S.start || "00:00").split(":").map(Number);
+  const t = Math.round(h * 60 + m + offset * 60) % 1440;
+  return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
+}
+function renderExplain(res) {
+  if (!S.players.some(p => p.id === explainId)) explainId = (S.players.find(p => p.id !== S.payer) || S.players[0] || {}).id;
+  $("explain-player").innerHTML = S.players.map(p => `<option value="${p.id}"${p.id === explainId ? " selected" : ""}>${esc(p.name || "(tanpa nama)")}</option>`).join("");
+  const r = res.rows.find(x => x.p.id === explainId); if (!r) { $("explain").innerHTML = ""; return; }
+  const n = res.rows.length, h = hoursOf(r.p), fmt = v => Math.round(v).toLocaleString("id-ID");
+  const items = S.costs.map(c => {
+    const net = Math.max(0, (+c.amount || 0) - (+c.covered || 0));
+    const base = c.covered ? `(${fmt(c.amount)} − ${fmt(c.covered)} ditanggung${c.coveredBy ? " " + esc(c.coveredBy) : ""})` : fmt(net);
+    const H = fullHours(), idx = res.rows.indexOf(r);
+    const f = c.split === "hours"
+      ? `${base} ÷ ${H} jam = ${fmt(net / H)} per jam<br>` + res.segs.filter(s => s.present.includes(idx))
+          .map(s => `${clock(s.a)}–${clock(s.b)}: ${fmt(net / H)} × ${s.b - s.a} jam ÷ ${s.present.length} pemain = ${fmt(net * (s.b - s.a) / H / s.present.length)}`).join("<br>") +
+        `<br>Jumlah = ${fmt(r.parts[c.id])}`
+      : `${base} ÷ ${n} pemain = ${fmt(r.parts[c.id])}`;
+    return `<li>${esc(c.name)} (${c.split === "hours" ? "per jam" : "rata"})<span class="f">${f}</span></li>`;
+  });
+  if (S.foodOn) items.push(`<li>Makanan<span class="f">${r.foodLines.length ? r.foodLines.map(esc).join("<br>") + `<br>Jumlah = ${fmt(r.food)}` : "tidak pesan = 0"}</span></li>`);
+  const raw = Object.values(r.parts).reduce((a, b) => a + b, 0) + r.food;
+  const rl = { "0": "tidak dibulatkan", "1000": "dibulatkan ke atas 1.000", "down1000": "dibulatkan ke bawah 1.000" }[S.round];
+  items.push(`<li><b>Total</b><span class="f">${fmt(raw)}, ${rl} = ${fmt(r.final)} (${rb(r.final)})</span></li>`);
+  $("explain").innerHTML = items.join("");
+}
+$("explain-player").addEventListener("change", e => { explainId = e.target.value; renderOutput(); });
+
+const FIELDS = { title: "f-title", vs: "f-vs", date: "f-date", venue: "f-venue", court: "f-court", start: "f-start", end: "f-end", bank: "f-bank", round: "f-round" };
+function renderAll() {
+  for (const [k, id] of Object.entries(FIELDS)) $(id).value = S[k] ?? "";
+  renderPayer(); renderPlayers(); renderCosts(); renderPartials(); renderFood(); renderOutput();
+}
+for (const [k, id] of Object.entries(FIELDS)) for (const ev of ["input", "change"]) $(id).addEventListener(ev, e => {
+  S[k] = e.target.value;
+  if (k === "start" || k === "end") renderPartials();
+  renderOutput();
+});
+$("f-payer").addEventListener("change", e => { S.payer = e.target.value; renderOutput(); });
+$("f-food").addEventListener("change", e => { S.foodOn = e.target.checked; renderFood(); renderOutput(); });
+
+$("players").addEventListener("input", e => {
+  const row = e.target.closest(".name-row"); if (!row) return;
+  S.players.find(p => p.id === row.dataset.id).name = e.target.value;
+  renderPayer(); renderPartials(); renderFood(); renderOutput();
+  const again = $("players").querySelector(`[data-id="${row.dataset.id}"] input`); if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+});
+$("players").addEventListener("click", e => {
+  if (!e.target.matches("[data-del]")) return;
+  const id = e.target.closest(".name-row").dataset.id;
+  S.players = S.players.filter(p => p.id !== id);
+  S.foodItems.forEach(f => f.who = f.who.filter(x => x !== id)); if (S.payer === id) S.payer = "";
+  renderAll();
+});
+$("add-player").onclick = () => {
+  S.players.push({ id: uid("p"), name: "" });
+  renderAll();
+  const inputs = $("players").querySelectorAll("input"); inputs[inputs.length - 1]?.focus();
+};
+
+function onCostEdit(e) {
+  const row = e.target.closest(".cost-row"); if (!row) return;
+  const c = S.costs.find(x => x.id === row.dataset.id), k = e.target.dataset.k;
+  if (k === "amount" || k === "covered") c[k] = num(e.target.value);
+  else c[k] = e.target.value;
+  if (k === "split") renderPartials();
+  renderOutput();
+}
+$("costs").addEventListener("input", onCostEdit);
+$("costs").addEventListener("change", onCostEdit);
+$("costs").addEventListener("click", e => {
+  if (!e.target.matches("[data-del]")) return;
+  const id = e.target.closest(".cost-row").dataset.id;
+  S.costs = S.costs.filter(c => c.id !== id);
+  renderCosts(); renderPartials(); renderOutput();
+});
+$("add-cost").onclick = () => { S.costs.push({ id: uid("c"), name: "Lain-lain", amount: 0, split: "equal" }); renderCosts(); renderPartials(); renderOutput(); };
+
+// Some phone browsers fire only "change" on selects and number fields, so listen to both.
+function onPartialEdit(e) {
+  const row = e.target.closest(".partial-row"); if (!row) return;
+  const q = S.partial[+row.dataset.i];
+  if (e.target.dataset.k === "player") {
+    if (q.player === e.target.value) return;
+    q.player = e.target.value; renderPartials();
+  } else q.hours = +String(e.target.value).replace(",", ".") || 0;
+  renderOutput();
+}
+$("partials").addEventListener("input", onPartialEdit);
+$("partials").addEventListener("change", onPartialEdit);
+$("partials").addEventListener("click", e => {
+  if (!e.target.matches("[data-del]")) return;
+  S.partial.splice(+e.target.closest(".partial-row").dataset.i, 1);
+  renderPartials(); renderOutput();
+});
+$("add-partial").onclick = () => {
+  const free = S.players.find(p => !S.partial.some(q => q.player === p.id)); if (!free) return;
+  S.partial.push({ player: free.id, hours: Math.max(0, fullHours() - 1) });
+  renderPartials(); renderOutput();
+};
+
+function onFoodEdit(e) {
+  const row = e.target.closest(".food-item"); if (!row) return;
+  const f = S.foodItems.find(x => x.id === row.dataset.id), k = e.target.dataset.k; if (!k) return;
+  f[k] = k === "price" ? num(e.target.value) : e.target.value;
+  renderOutput();
+}
+$("food").addEventListener("input", onFoodEdit);
+$("food").addEventListener("change", onFoodEdit);
+$("food").addEventListener("click", e => {
+  const row = e.target.closest(".food-item"); if (!row) return;
+  const f = S.foodItems.find(x => x.id === row.dataset.id);
+  if (e.target.matches("[data-del]")) { S.foodItems = S.foodItems.filter(x => x !== f); renderFood(); renderOutput(); return; }
+  const chip = e.target.closest(".who-chip"); if (!chip) return;
+  const pid = chip.dataset.p;
+  f.who = f.who.includes(pid) ? f.who.filter(x => x !== pid) : f.who.concat(pid);
+  chip.setAttribute("aria-pressed", f.who.includes(pid));
+  renderOutput();
+});
+$("add-food").onclick = () => {
+  S.foodItems.push({ id: uid("f"), name: "", price: 0, mode: "each", who: [] });
+  renderFood(); renderOutput();
+  const names = $("food").querySelectorAll('input[data-k="name"]'); names[names.length - 1]?.focus();
+};
+
+$("reset").onclick = () => { S = SAMPLE(); renderAll(); };
+$("copy").onclick = () => {
+  const text = $("msg").textContent;
+  const done = () => { $("status").textContent = "Tersalin"; setTimeout(() => $("status").textContent = "", 2000); };
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("msg")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); $("status").textContent = "Teks terpilih, tekan Ctrl+C"; };
+  try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+};
+// Keep the viewer's entries when a new version of the page is delivered, even where browser storage is unavailable.
+window.claude?.hot?.snapshot?.(() => ({ S: JSON.parse(JSON.stringify(S)) }));
+const boot = data => { if (data && data.S) S = data.S; migrate(); dropCovered(); renderAll(); };
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+</script>
