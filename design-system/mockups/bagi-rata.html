@@ -109,7 +109,7 @@ a.btn-ball { display: inline-block; text-decoration: none; border-radius: 6px; p
     <h1>Bagi <span>Rata</span></h1>
     <p class="sub">Hitung patungan lapangan, ballboy, dan lain-lain, lalu kirim ke grup WhatsApp.</p>
   </header>
-  <p class="example">Data contoh: COS Match #4, 17 Oct. Semua isian tersimpan otomatis di browser ini.</p>
+  <p class="example">Semua isian tersimpan otomatis di browser ini.</p>
 
   <div class="grid">
     <div class="col">
@@ -187,7 +187,7 @@ a.btn-ball { display: inline-block; text-decoration: none; border-radius: 6px; p
         <label>Pemain<select id="explain-player"></select></label>
         <ul class="explain" id="explain"></ul>
       </section>
-      <button id="reset" type="button" style="justify-self:start">Isi ulang dengan data contoh</button>
+      <button id="reset" type="button" style="justify-self:start">Kosongkan semua data</button>
     </div>
   </div>
 </div>
@@ -206,26 +206,19 @@ h2 .check { font-family: var(--f-body); }
 </style>
 
 <script>
-const KEY = "bagi-rata-v5";
+const KEY = "bagi-rata-v6";
 const SAMPLE = () => ({
-  title: "COS Match #4 (Home)", vs: "TDP", date: "2026-10-17", venue: "Nordic Ancol", court: "Lapangan 2",
-  start: "18:00", end: "22:00", bank: "BCA 6300102008 a/n Winarto Kusuma", round: "1000", payer: "p0",
+  title: "", vs: "", date: "", venue: "", court: "",
+  start: "", end: "", bank: "", round: "1000", payer: "",
   costs: [
-    { id: "c1", name: "Lapangan", amount: 613000, split: "hours" },
-    { id: "c2", name: "Ball boy", amount: 100000, split: "equal" },
-    { id: "c3", name: "Bola baru", amount: 110000, split: "equal" }
+    { id: "c1", name: "Lapangan", amount: 0, split: "hours" },
+    { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
+    { id: "c3", name: "Bola baru", amount: 0, split: "equal" }
   ],
-  players: [
-    { id: "p0", name: "Lius" }, { id: "p1", name: "Adrian" }, { id: "p2", name: "Ivan" }, { id: "p3", name: "Jonsen" },
-    { id: "p4", name: "KP" }, { id: "p5", name: "Delix" }, { id: "p6", name: "Gebe" }
-  ],
+  players: [],
   partial: [],
   foodOn: true,
-  foodItems: [
-    { id: "f1", name: "Nasi + lauk spesial", price: 108000, mode: "each", who: ["p5"] },
-    { id: "f2", name: "Nasi + lauk", price: 80000, mode: "each", who: ["p0", "p1", "p2"] },
-    { id: "f3", name: "Minuman", price: 26000, mode: "each", who: ["p0", "p1", "p2", "p5", "p6"] }
-  ]
+  foodItems: []
 });
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)) || SAMPLE(); } catch (e) { S = SAMPLE(); }
@@ -321,7 +314,7 @@ function compute() {
 }
 
 function buildMessage(res) {
-  const lines = [S.title];
+  const lines = S.title ? [S.title] : [];
   if (S.vs) lines.push("", "VS " + S.vs);
   lines.push("");
   const dl = dateLine(S.date); if (dl) lines.push(dl);

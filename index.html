@@ -216,7 +216,7 @@ const STR = {
     surf: { grass: "Rumput", clay: "Tanah liat", hard: "Hard court" }, k: "rb",
     days: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
     sideTitle: "Bagi Rata untuk iPhone", sideIntro: "Mockup tampilan aplikasi di iPhone. Semua tombol bisa dicoba. Ketuk ikon roda gigi untuk mengganti bahasa dan tema lapangan.",
-    sideSample: "Data contoh: COS Match #4, 17 Oct.", reset: "Isi ulang data contoh", guide: "Warna tema ini", guideType: "Outfit untuk judul dan angka besar, Plus Jakarta Sans untuk teks.", settings: "Setelan"
+    sideSample: "Semua isian mulai kosong dan tersimpan di HP/browser masing-masing.", reset: "Kosongkan semua data", guide: "Warna tema ini", guideType: "Outfit untuk judul dan angka besar, Plus Jakarta Sans untuk teks.", settings: "Setelan"
   },
   en: {
     tabs: { sesi: "Session", pemain: "Players", biaya: "Costs", makanan: "Food", tagihan: "Bills", setelan: "Settings" },
@@ -237,7 +237,7 @@ const STR = {
     surf: { grass: "Grass", clay: "Clay", hard: "Hard court" }, k: "k",
     days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
     sideTitle: "Bagi Rata for iPhone", sideIntro: "A mockup of the app on iPhone. Every button works. Tap the gear icon to change the language and court theme.",
-    sideSample: "Sample data: COS Match #4, 17 Oct.", reset: "Reload sample data", guide: "Colors in this theme", guideType: "Outfit for titles and big numbers, Plus Jakarta Sans for text.", settings: "Settings"
+    sideSample: "Everything starts blank and is saved on each phone or browser.", reset: "Clear all data", guide: "Colors in this theme", guideType: "Outfit for titles and big numbers, Plus Jakarta Sans for text.", settings: "Settings"
   }
 };
 
@@ -311,26 +311,21 @@ prefersDark?.addEventListener?.("change", applyCourt);
 new MutationObserver(applyCourt).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 // ---------- Data ----------
-const KEY = "bagi-rata-iphone-v1", PKEY = "bagi-rata-iphone-prefs";
+const KEY = "bagi-rata-iphone-v2", PKEY = "bagi-rata-iphone-prefs";
+// New sessions start blank; the three usual cost rows are kept as named placeholders.
 const SAMPLE = () => ({
-  title: "COS Match #4 (Home)", vs: "TDP", date: "2026-10-17", venue: "Nordic Ancol",
-  courts: [{ id: "k1", name: "Lapangan 2", start: "18:00", hours: 4 }], bank: "BCA 6300102008 a/n Winarto Kusuma", round: "1000", payer: "p0",
+  title: "", vs: "", date: "", venue: "",
+  courts: [{ id: "k1", name: "Lapangan 1", start: "", hours: 2 }],
+  bank: "", round: "1000", payer: "",
   costs: [
-    { id: "c1", name: "Lapangan", amount: 613000, split: "hours" },
-    { id: "c2", name: "Ball boy", amount: 100000, split: "equal" },
-    { id: "c3", name: "Bola baru", amount: 110000, split: "equal" }
+    { id: "c1", name: "Lapangan", amount: 0, split: "hours" },
+    { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
+    { id: "c3", name: "Bola baru", amount: 0, split: "equal" }
   ],
-  players: [
-    { id: "p0", name: "Lius" }, { id: "p1", name: "Adrian" }, { id: "p2", name: "Ivan" }, { id: "p3", name: "Jonsen" },
-    { id: "p4", name: "KP" }, { id: "p5", name: "Delix" }, { id: "p6", name: "Gebe" }
-  ],
+  players: [],
   partial: [],
   foodOn: true,
-  foodItems: [
-    { id: "f1", name: "Nasi + lauk spesial", price: 108000, mode: "each", who: ["p5"] },
-    { id: "f2", name: "Nasi + lauk", price: 80000, mode: "each", who: ["p0", "p1", "p2"] },
-    { id: "f3", name: "Minuman", price: 26000, mode: "each", who: ["p0", "p1", "p2", "p5", "p6"] }
-  ]
+  foodItems: []
 });
 let S, P;
 try { S = JSON.parse(localStorage.getItem(KEY)) || SAMPLE(); } catch (e) { S = SAMPLE(); }
@@ -366,7 +361,7 @@ function dateLine(v) {
   return `${L().days[new Date(y, m - 1, d).getDay()]}, ${d} ${BULAN[m - 1]}`;
 }
 // Session runs from the earliest court start to the latest court end (minutes; wraps past midnight).
-const toMin = v => { const [h, m] = (v || "0:0").split(":").map(Number); return h * 60 + m; };
+const toMin = v => { const [h, m] = (v || "0:0").split(":").map(Number); return (h || 0) * 60 + (m || 0); };
 function span() {
   if (!S.courts.length) return { a: 0, b: 0, list: [] };
   const first = Math.min(...S.courts.map(c => toMin(c.start)));
@@ -428,9 +423,9 @@ function compute() {
   return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, segs, CH };
 }
 function buildMessage(res) {
-  const lines = [S.title];
+  const lines = S.title ? [S.title] : [];
   if (S.vs) lines.push("", "VS " + S.vs);
-  lines.push("");
+  if (lines.length) lines.push("");
   const dl = dateLine(S.date); if (dl) lines.push(dl);
   const sp = span();
   const sameTime = sp.list.every(x => x.a === sp.list[0].a && x.b === sp.list[0].b);
@@ -438,7 +433,7 @@ function buildMessage(res) {
     const names = S.courts.map(c => c.name).filter(Boolean).join(", ");
     const place = [S.venue, names ? `(${names})` : ""].filter(Boolean).join(" ");
     if (place) lines.push("📍" + place);
-    if (S.courts.length) lines.push(`${sessionStart()}-${sessionEnd()}`);
+    if (S.courts.some(c => c.start)) lines.push(`${sessionStart()}-${sessionEnd()}`);
   } else {
     if (S.venue) lines.push("📍" + S.venue);
     for (const x of sp.list) lines.push(`${x.c.name}: ${clock(x.a)}-${clock(x.b)}`);
