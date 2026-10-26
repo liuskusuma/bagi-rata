@@ -201,7 +201,8 @@ const STR = {
     tabs: { sesi: "Sesi", pemain: "Pemain", biaya: "Biaya", makanan: "Makanan", tagihan: "Tagihan", setelan: "Setelan" },
     subs: { sesi: "Detail pertandingan", pemain: "Siapa yang main", biaya: "Lapangan, ballboy, bola", makanan: "Pesanan per orang", tagihan: "Siap dikirim ke grup", setelan: "Bahasa dan tema" },
     match: "Pertandingan", title: "Judul", vs: "Lawan", optional: "Opsional", timePlace: "Waktu dan tempat", date: "Tanggal", venue: "Tempat", court: "Lapangan",
-    start: "Mulai", end: "Selesai", duration: h => `Durasi ${h} jam.`, payment: "Pembayaran", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
+    start: "Mulai", end: "Selesai", duration: h => `Durasi ${h} jam.`, courts: "Lapangan", length: "Durasi", addCourt: "+ Tambah lapangan", courtN: n => `Lapangan ${n}`,
+    courtsNote: (ch, a, b) => `Total ${ch} jam lapangan, ${a}–${b}. Biaya "Per jam" dibagi menurut jam lapangan yang dipakai di tiap jam.`, courtHours: "jam lapangan", crt: "lap", payment: "Pembayaran", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
     payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
     hoursPlayed: "Jam main", hours: h => `${h} jam`, addPartial: "+ Pemain tidak main full", noName: "(tanpa nama)", del: "Hapus", less: "Kurangi", more: "Tambah",
     partialNote: h => `Semua pemain dianggap main penuh ${h} jam. Tambahkan hanya yang tidak full; dianggap main dari awal.`,
@@ -221,7 +222,8 @@ const STR = {
     tabs: { sesi: "Session", pemain: "Players", biaya: "Costs", makanan: "Food", tagihan: "Bills", setelan: "Settings" },
     subs: { sesi: "Match details", pemain: "Who played", biaya: "Court, ball boy, balls", makanan: "Orders per person", tagihan: "Ready to send to the group", setelan: "Language and theme" },
     match: "Match", title: "Title", vs: "Opponent", optional: "Optional", timePlace: "Time and place", date: "Date", venue: "Venue", court: "Court",
-    start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, payment: "Payment", bank: "Bank account", payee: "Payee", none: "None",
+    start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Courts", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
+    courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bank: "Bank account", payee: "Payee", none: "None",
     payeeNote: "The payee is included in the split but left out of the message.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
     partialNote: h => `Everyone is counted for the full ${h} hours. Add only players who left early; they are counted from the start.`,
@@ -311,8 +313,8 @@ new MutationObserver(applyCourt).observe(document.documentElement, { attributes:
 // ---------- Data ----------
 const KEY = "bagi-rata-iphone-v1", PKEY = "bagi-rata-iphone-prefs";
 const SAMPLE = () => ({
-  title: "COS Match #4 (Home)", vs: "TDP", date: "2026-10-17", venue: "Nordic Ancol", court: "Lapangan 2",
-  start: "18:00", end: "22:00", bank: "BCA 6300102008 a/n Winarto Kusuma", round: "1000", payer: "p0",
+  title: "COS Match #4 (Home)", vs: "TDP", date: "2026-10-17", venue: "Nordic Ancol",
+  courts: [{ id: "k1", name: "Lapangan 2", start: "18:00", hours: 4 }], bank: "BCA 6300102008 a/n Winarto Kusuma", round: "1000", payer: "p0",
   costs: [
     { id: "c1", name: "Lapangan", amount: 613000, split: "hours" },
     { id: "c2", name: "Ball boy", amount: 100000, split: "equal" },
@@ -363,15 +365,21 @@ function dateLine(v) {
   const [y, m, d] = v.split("-").map(Number);
   return `${L().days[new Date(y, m - 1, d).getDay()]}, ${d} ${BULAN[m - 1]}`;
 }
-function fullHours() {
-  if (!S.start || !S.end) return 0;
-  const t = s => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
-  let d = t(S.end) - t(S.start); if (d <= 0) d += 1440;
-  return d / 60;
+// Session runs from the earliest court start to the latest court end (minutes; wraps past midnight).
+const toMin = v => { const [h, m] = (v || "0:0").split(":").map(Number); return h * 60 + m; };
+function span() {
+  if (!S.courts.length) return { a: 0, b: 0, list: [] };
+  const first = Math.min(...S.courts.map(c => toMin(c.start)));
+  const list = S.courts.map(c => { let a = toMin(c.start) - first; if (a < 0) a += 1440; return { c, a: a / 60, b: a / 60 + (+c.hours || 0) }; });
+  return { a: first, b: Math.max(...list.map(x => x.b)), list };
 }
+const fullHours = () => span().b;
+const courtHours = () => S.courts.reduce((t, c) => t + (+c.hours || 0), 0);
+const sessionStart = () => S.courts.length ? clock(0) : "";
+const sessionEnd = () => S.courts.length ? clock(fullHours()) : "";
 function clock(offset) {
-  const [h, m] = (S.start || "00:00").split(":").map(Number);
-  const t = Math.round(h * 60 + m + offset * 60) % 1440;
+  const first = S.courts.length ? Math.min(...S.courts.map(c => toMin(c.start))) : 0;
+  const t = ((Math.round(first + offset * 60) % 1440) + 1440) % 1440;
   return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
 }
 const hoursOf = p => { const x = S.partial.find(q => q.player === p.id); return x ? +x.hours || 0 : fullHours(); };
@@ -389,20 +397,23 @@ function compute() {
       r.foodLines.push(f.mode === "split" ? `${f.name}: ${fmt(+f.price || 0)} ÷ ${who.length} ${T.people} = ${fmt(each)}` : `${f.name}: ${fmt(each)}`);
     }
   }
-  const H = fullHours();
+  // Per-hour costs follow court-hours: each time slice costs (courts in use × its length) ÷ total court-hours,
+  // shared by the players on court then. Players who left early count from the start.
+  const sp = span(), H = sp.b, CH = courtHours();
   const hs = rows.map(r => Math.min(hoursOf(r.p), H));
-  const pts = [...new Set([0, H, ...hs])].filter(x => x >= 0 && x <= H).sort((a, b) => a - b);
+  const pts = [...new Set([0, H, ...hs, ...sp.list.flatMap(x => [x.a, x.b])])].filter(x => x >= 0 && x <= H).sort((a, b) => a - b);
   const segs = [];
   for (let i = 0; i < pts.length - 1; i++) {
     const a = pts[i], b = pts[i + 1], present = rows.map((r, j) => j).filter(j => hs[j] > a);
-    if (present.length) segs.push({ a, b, present });
+    const w = sp.list.filter(x => x.a <= a && x.b >= b).length;
+    if (present.length && w) segs.push({ a, b, present, w });
   }
   let costTotal = 0;
   for (const c of S.costs) {
     const amt = Math.max(0, +c.amount || 0); costTotal += amt;
     rows.forEach(r => r.parts[c.id] = 0);
-    if (c.split === "hours" && H > 0) {
-      for (const s of segs) for (const j of s.present) rows[j].parts[c.id] += amt * (s.b - s.a) / H / s.present.length;
+    if (c.split === "hours" && CH > 0) {
+      for (const s of segs) for (const j of s.present) rows[j].parts[c.id] += amt * s.w * (s.b - s.a) / CH / s.present.length;
     } else for (const r of rows) r.parts[c.id] = ps.length ? amt / ps.length : 0;
   }
   const foodTotal = rows.reduce((a, r) => a + r.food, 0);
@@ -414,16 +425,24 @@ function compute() {
   }
   const allShares = rows.reduce((a, r) => a + r.final, 0);
   const collected = rows.reduce((a, r) => a + (r.p.id === S.payer ? 0 : r.final), 0);
-  return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, segs };
+  return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, segs, CH };
 }
 function buildMessage(res) {
   const lines = [S.title];
   if (S.vs) lines.push("", "VS " + S.vs);
   lines.push("");
   const dl = dateLine(S.date); if (dl) lines.push(dl);
-  const place = [S.venue, S.court ? `(${S.court})` : ""].filter(Boolean).join(" ");
-  if (place) lines.push("📍" + place);
-  if (S.start || S.end) lines.push(`${S.start}-${S.end}`);
+  const sp = span();
+  const sameTime = sp.list.every(x => x.a === sp.list[0].a && x.b === sp.list[0].b);
+  if (sameTime) {
+    const names = S.courts.map(c => c.name).filter(Boolean).join(", ");
+    const place = [S.venue, names ? `(${names})` : ""].filter(Boolean).join(" ");
+    if (place) lines.push("📍" + place);
+    if (S.courts.length) lines.push(`${sessionStart()}-${sessionEnd()}`);
+  } else {
+    if (S.venue) lines.push("📍" + S.venue);
+    for (const x of sp.list) lines.push(`${x.c.name}: ${clock(x.a)}-${clock(x.b)}`);
+  }
   lines.push("");
   for (const r of res.rows) if (r.p.name && r.p.id !== S.payer) lines.push(`${r.p.name} - ${rb(r.final)}`);
   if (S.bank) lines.push("", S.bank);
@@ -457,11 +476,18 @@ function viewSesi(T) {
     <div class="group">
       <div class="row"><label for="s-date">${T.date}</label><input id="s-date" type="date" data-s="date" value="${esc(S.date)}"></div>
       <div class="row"><label for="s-venue">${T.venue}</label><input id="s-venue" data-s="venue" value="${esc(S.venue)}"></div>
-      <div class="row"><label for="s-court">${T.court}</label><input id="s-court" data-s="court" value="${esc(S.court)}"></div>
-      <div class="row"><label for="s-start">${T.start}</label><input id="s-start" type="time" data-s="start" data-re value="${esc(S.start)}"></div>
-      <div class="row"><label for="s-end">${T.end}</label><input id="s-end" type="time" data-s="end" data-re value="${esc(S.end)}"></div>
     </div>
-    <p class="foot">${T.duration(fullHours())}</p>
+    <div class="group-title">${T.courts}</div>
+    ${S.courts.map((c, i) => `
+    <div class="group"${i ? ' style="margin-top:10px"' : ""}>
+      <div class="row">${S.courts.length > 1 ? `<button type="button" class="minus" data-del-court="${c.id}" aria-label="${T.del}">−</button>` : ""}
+        <input class="left" aria-label="${T.court}" data-col="courts" data-id="${c.id}" data-k="name" value="${esc(c.name)}" placeholder="${T.court}" style="font-weight:600"></div>
+      <div class="row"><label>${T.start}</label><input type="time" aria-label="${T.start}" data-col="courts" data-id="${c.id}" data-k="start" data-re value="${esc(c.start)}"></div>
+      <div class="row"><span class="lbl">${T.length}</span>
+        <div class="stepper"><button type="button" data-court-step="-0.5" data-id="${c.id}" aria-label="${T.less}">−</button><span>${T.hours(c.hours)}</span><button type="button" data-court-step="0.5" data-id="${c.id}" aria-label="${T.more}">+</button></div></div>
+    </div>`).join("")}
+    <div class="group" style="margin-top:10px"><div class="row"><button type="button" class="addrow" id="add-court">${T.addCourt}</button></div></div>
+    <p class="foot">${T.courtsNote(courtHours(), sessionStart(), sessionEnd())}</p>
     <div class="group-title">${T.payment}</div>
     <div class="group">
       <div class="row"><label for="s-bank">${T.bank}</label><input id="s-bank" data-s="bank" value="${esc(S.bank)}"></div>
@@ -530,9 +556,10 @@ function explainHtml(T, res, r) {
   const H = fullHours(), idx = res.rows.indexOf(r), n = res.rows.length;
   const items = S.costs.map(c => {
     const net = Math.max(0, +c.amount || 0);
-    const f = c.split === "hours" && H > 0
-      ? `${fmt(net)} ÷ ${H} ${T.perHourShort} = ${fmt(net / H)}/${T.perHourShort}<br>` + res.segs.filter(s => s.present.includes(idx))
-          .map(s => `${clock(s.a)}–${clock(s.b)}: × ${s.b - s.a} ${T.perHourShort} ÷ ${s.present.length} ${T.ppl} = ${fmt(net * (s.b - s.a) / H / s.present.length)}`).join("<br>")
+    const CH = res.CH;
+    const f = c.split === "hours" && CH > 0
+      ? `${fmt(net)} ÷ ${CH} ${T.courtHours} = ${fmt(net / CH)}/${T.perHourShort}<br>` + res.segs.filter(s => s.present.includes(idx))
+          .map(s => `${clock(s.a)}–${clock(s.b)}: ${s.w > 1 ? `${s.w} ${T.crt} × ` : ""}${s.b - s.a} ${T.perHourShort} ÷ ${s.present.length} ${T.ppl} = ${fmt(net * s.w * (s.b - s.a) / CH / s.present.length)}`).join("<br>")
       : `${fmt(net)} ÷ ${n} ${T.ppl} = ${fmt(r.parts[c.id])}`;
     return `<div><b>${esc(c.name)}</b> ${fmt(r.parts[c.id])}<span class="f">${f}</span></div>`;
   });
@@ -617,6 +644,7 @@ function onEdit(e) {
   } else if (el.dataset.col) {
     const item = S[el.dataset.col].find(x => x.id === el.dataset.id);
     item[el.dataset.k] = el.classList.contains("money") ? num(el.value) : el.value;
+    if (e.type === "change" && el.dataset.re !== undefined) render(true);
   } else if (el.dataset.partial !== undefined) {
     S.partial[+el.dataset.partial].player = el.value;
     if (e.type === "change") render(true);
@@ -641,6 +669,9 @@ $("content").addEventListener("click", e => {
     if (S.payer === d.delPlayer) S.payer = "";
   } else if (d.delPartial !== undefined) S.partial.splice(+d.delPartial, 1);
   else if (d.step) { const q = S.partial[+d.i]; q.hours = Math.min(fullHours(), Math.max(0, q.hours + +d.step)); }
+  else if (d.courtStep) { const c = S.courts.find(x => x.id === d.id); c.hours = Math.max(0.5, Math.min(24, c.hours + +d.courtStep)); }
+  else if (d.delCourt) S.courts = S.courts.filter(c => c.id !== d.delCourt);
+  else if (b.id === "add-court") { const last = S.courts[S.courts.length - 1]; S.courts.push({ id: uid("k"), name: (() => { let n = S.courts.length + 1; while (S.courts.some(c => c.name === T.courtN(n))) n++; return T.courtN(n); })(), start: last ? last.start : "18:00", hours: last ? last.hours : 2 }); }
   else if (d.delCost) S.costs = S.costs.filter(c => c.id !== d.delCost);
   else if (d.delFood) S.foodItems = S.foodItems.filter(f => f.id !== d.delFood);
   else if (d.food) { const f = S.foodItems.find(x => x.id === d.food); f.who = f.who.includes(d.p) ? f.who.filter(x => x !== d.p) : f.who.concat(d.p); }
@@ -663,6 +694,14 @@ $("gear").onclick = () => { tab = tab === "setelan" ? "sesi" : "setelan"; render
 $("summary").onclick = () => { tab = "tagihan"; render(); };
 $("reset").onclick = () => { S = SAMPLE(); open = null; render(); };
 
+// Older saves had one court with start/end; turn it into the courts list.
+function migrateCourts() {
+  if (S.courts) return;
+  const t = s => { const [h, m] = (s || "0:0").split(":").map(Number); return h * 60 + m; };
+  let d = S.start && S.end ? t(S.end) - t(S.start) : 120; if (d <= 0) d += 1440;
+  S.courts = [{ id: "k1", name: S.court || "Lapangan 1", start: S.start || "18:00", hours: d / 60 }];
+  delete S.court; delete S.start; delete S.end;
+}
 // "Ditanggung" was removed for now; fold any saved covered amount into the cost itself.
 function dropCovered() {
   for (const c of S.costs) if (c.covered !== undefined) { c.amount = Math.max(0, (+c.amount || 0) - (+c.covered || 0)); delete c.covered; delete c.coveredBy; }
@@ -671,7 +710,7 @@ window.claude?.hot?.snapshot?.(() => ({ S: JSON.parse(JSON.stringify(S)), P: Obj
 const boot = data => {
   if (data && data.S) { S = data.S; tab = data.tab || tab; }
   if (data && data.P) P = Object.assign(P, data.P);
-  dropCovered(); applyCourt(); render();
+  migrateCourts(); dropCovered(); applyCourt(); render();
 };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 </script>
