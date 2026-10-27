@@ -3,7 +3,7 @@
   "short_name": "BR Langkah",
   "description": "Bagi biaya main tenis dan kirim tagihannya ke WhatsApp.",
   "lang": "id",
-  "start_url": "langkah.html",
+  "start_url": "langkah.html?mode=guided",
   "scope": "./",
   "display": "standalone",
   "background_color": "#193e0c",
