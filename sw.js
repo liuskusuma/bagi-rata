@@ -11,7 +11,7 @@ self.addEventListener("fetch", e => {
   e.respondWith(
     // Network first so updates arrive; own files skip the browser's HTTP cache (GitHub Pages keeps them 10 minutes).
     // Falls back to the cache when offline.
-    fetch(new URL(e.request.url).origin === location.origin ? new Request(e.request, { cache: "no-cache" }) : e.request).then(res => {
+    fetch(new URL(e.request.url).origin === location.origin ? e.request.url : e.request, { cache: "no-cache" }).then(res => {
       if (res.ok || res.type === "opaque") { const copy = res.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); }
       return res;
     }).catch(() => caches.match(e.request).then(r => r || caches.match("index.html")))
