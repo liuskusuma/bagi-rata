@@ -92,3 +92,11 @@ Adrian - 224rb
 
 BCA 6300102008 a/n Winarto Kusuma
 ```
+
+## Tema Court Finder (27 Okt 2026)
+
+Tema kelima di Setelan, diambil dari design system Court Finder (https://claude.ai/artifact/DeV1LpMb9decq1zCzv855C). Hanya berlaku saat tema ini dipilih; empat tema Grand Slam tidak berubah.
+
+- Gaya soft UI: kartu "menonjol" dan isian "tertekan ke dalam", tanpa garis tepi dan tanpa tekstur lapangan.
+- Warna: navy `#14234f` (kartu dan latar), `#101d44` (isian), bayangan `#1c3066` / `#0b1534`, teks `#f5f7fc`, teks pudar `#8e9cc6`, satu aksen kuning `#fbc02d`.
+- Huruf judul: Exo 2 miring (italic), sama seperti logo Court Finder.
