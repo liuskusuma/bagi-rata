@@ -109,3 +109,13 @@ Satu aplikasi dengan dua tampilan. Tombol dua ikon di sebelah roda gigi (dan pil
 - **Standar (bawaan):** lima tab di bawah (Sesi, Pemain, Biaya, Makanan, Tagihan).
 
 Datanya sama, jadi berganti tampilan tidak menghapus isian.
+
+## Bentuk soft UI di semua tema (27 Okt 2026)
+
+Bentuk elemen dari tema Default sekarang dipakai di semua tema. Warna tiap tema tetap.
+
+- Kartu berwarna sama dengan lapangan (warna "Utama" tema) dan terlihat menonjol. Bayangan terang memakai warna "Terang", bayangan gelap memakai warna "Gelap".
+- Kotak isian, tombol pilihan, stepper, dan chip terlihat tertekan ke dalam, dengan warna sedikit lebih gelap dari kartu.
+- Huruf judul dan label: Exo 2 tebal (judul miring). Isian dan teks lain: huruf sistem iPhone (SF).
+- Aksen tetap warna aksen gelap tiap tema. Kalau aksen kurang terbaca sebagai teks di atas kartu, otomatis dibuat lebih terang sampai kontrasnya minimal 4.5:1.
+- Khusus tema Default: header polos tanpa garis kapur, dan catatan tanpa kotak gelap.
