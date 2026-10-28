@@ -316,7 +316,7 @@ const STR = {
     stepOf: (i, n) => `Langkah ${i} dari ${n}`, mode: "Tampilan", guided: "Terpandu", standard: "Standar", modeNote: "Terpandu: isi satu halaman per langkah sampai Tagihan. Standar: semua bagian lewat tab di bawah. Bisa juga diganti lewat tombol di sebelah roda gigi.", next: s => `Lanjut: ${s}`, back: "Kembali", done: "Selesai", newBill: "Tagihan baru", newConfirm: "Hapus semua isian dan mulai tagihan baru?",
     matchNote: "Judul jadi baris pertama pesan. Lawan boleh dikosongkan.", placeNote: "Main di lebih dari satu lapangan? Tambahkan lapangannya, masing-masing dengan jam mulai dan durasinya.",
     payeeName: "Nama penerima", payNote: "Rekening ini muncul di baris terakhir pesan. Semua pemain ikut ditagih.",
-    hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", scan: "Foto bill makanan", scanReading: "Membaca bill…", scanLoading: "Menyiapkan pembaca (sekali saja, sekitar 8 MB)…",
+    hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", scan: "Foto bill makanan", scanReading: "Membaca bill…", scanAi: "AI sedang membaca bill…", scanLoading: "Menyiapkan pembaca (sekali saja, sekitar 8 MB)…",
     scanTitle: "Hasil baca bill", scanCheck: "Cek jumlah, nama, dan harga (harga = total baris), lalu hapus centang yang bukan makanan. Setelah ditambahkan, tinggal pilih siapa yang pesan.",
     scanNone: "Tidak ada makanan yang terbaca. Coba foto lebih dekat, lurus, dan terang, atau isi manual.", scanFail: "Gagal membaca foto. Pemakaian pertama butuh internet untuk mengunduh pembaca.",
     scanExtra: amt => `Masukkan pajak & service (${amt}) ke harga tiap makanan`, scanAdd: n => `Tambahkan ${n} makanan`, qty: "Jumlah", scanCount: (n, q) => `Bill menulis ${n} porsi, terbaca ${q}. Cek kolom jumlah.`, scanTotal: t => `Total terbaca ${t}.`, scanMatch: t => `Total terbaca ${t}, cocok dengan subtotal bill.`, scanDiff: (t, b) => `Total terbaca ${t}, beda dengan subtotal bill ${b}. Cek harga yang salah baca.`, cancel: "Batal", retry: "Foto ulang", foodSkip: "Tidak ada makanan? Langsung lanjut ke Tagihan.", needPlayers: "Belum ada pemain. Tambahkan dulu di langkah Pemain.",
@@ -344,7 +344,7 @@ const STR = {
     stepOf: (i, n) => `Step ${i} of ${n}`, mode: "Layout", guided: "Guided", standard: "Standard", modeNote: "Guided: one page per step until the Bill. Standard: every section in the tabs at the bottom. You can also switch with the button next to the gear.", next: s => `Next: ${s}`, back: "Back", done: "Done", newBill: "New bill", newConfirm: "Clear everything and start a new bill?",
     matchNote: "The title is the first line of the message. Opponent is optional.", placeNote: "Played on more than one court? Add each court with its own start time and duration.",
     payeeName: "Payee name", payNote: "This account is the last line of the message. Every player is billed.",
-    hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", scan: "Photo of the food bill", scanReading: "Reading the bill…", scanLoading: "Getting the reader ready (first time only, about 8 MB)…",
+    hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", scan: "Photo of the food bill", scanReading: "Reading the bill…", scanAi: "AI is reading the bill…", scanLoading: "Getting the reader ready (first time only, about 8 MB)…",
     scanTitle: "What the bill says", scanCheck: "Check quantity, name and price (price = line total) and untick anything that is not food. Then just pick who ordered each one.",
     scanNone: "No food items could be read. Try a closer, straighter, brighter photo, or add them by hand.", scanFail: "Could not read the photo. The first use needs internet to download the reader.",
     scanExtra: amt => `Add tax & service (${amt}) to each item's price`, scanAdd: n => `Add ${n} items`, qty: "Quantity", scanCount: (n, q) => `The bill lists ${n} items, ${q} were read. Check the quantities.`, scanTotal: t => `Total read ${t}.`, scanMatch: t => `Total read ${t}, matches the bill subtotal.`, scanDiff: (t, b) => `Total read ${t}, differs from the bill subtotal ${b}. Check for a misread price.`, cancel: "Cancel", retry: "Retake", foodSkip: "No food? Go straight to the Bill.", needPlayers: "No players yet. Add them in the Players step first.",
@@ -1035,8 +1035,38 @@ function parseBill(text) {
   if (subtotal) for (const it of items) if (it.alt && Math.abs(sum() - it.total + it.alt - subtotal) < Math.abs(sum() - subtotal)) it.total = it.alt;
   return { items, extra: extras.reduce((a, e) => a + e.amount, 0), subtotal, count };
 }
+// AI reader: a small server (worker/ in the repo) sends the photo to Claude with the owner's API key.
+// Empty until the server is set up; if it fails or is busy, the on-phone reader below takes over.
+const AI_URL = "";
+// Claude reads photos best at about 1568px on the long side; a JPEG that size is a few hundred KB.
+async function photoData(file) {
+  const img = await createImageBitmap(file), k = Math.min(1, 1568 / Math.max(img.width, img.height));
+  const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", .85).split(",")[1];
+}
+async function readBillAi(file) {
+  const T = L(); let pct = .05;
+  sheetProgress(T.scanAi, pct);
+  const tick = setInterval(() => sheetProgress(T.scanAi, pct = Math.min(.95, pct + (1 - pct) * .08)), 400);
+  try {
+    const ctl = new AbortController(), stop = setTimeout(() => ctl.abort(), 45000);
+    const res = await fetch(AI_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: await photoData(file), mediaType: "image/jpeg" }), signal: ctl.signal });
+    clearTimeout(stop);
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (!Array.isArray(d.items)) return null;
+    const items = d.items.filter(i => i && i.name && i.total > 0).map(i => ({ name: String(i.name).trim(), qty: Math.max(1, Math.round(+i.qty || 1)), total: Math.round(+i.total) }));
+    const extra = (d.extras || []).reduce((a, e) => a + (Math.round(+e.amount) || 0), 0) - (Math.round(+d.discount) || 0);
+    return { items, extra: Math.max(0, extra), subtotal: Math.round(+d.subtotal) || 0, count: Math.round(+d.count) || 0, ai: true };
+  } catch (e) { return null; } finally { clearInterval(tick); }
+}
 async function readBill(file) {
   const T = L();
+  if (AI_URL && navigator.onLine !== false) {
+    const r = await readBillAi(file);
+    if (r && r.items.length) { scan = r; scan.withExtra = scan.extra > 0; return showScan(); }
+  }
   try {
     sheetProgress(T.scanLoading, 0);
     await loadScript(OCR.lib);
@@ -1139,7 +1169,6 @@ const boot = data => {
 };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
 </script>
-
 <script>
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 </script>
