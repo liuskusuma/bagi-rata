@@ -178,6 +178,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; bo
 [data-skin] .modesw { background: var(--well); box-shadow: var(--inset-sm); }
 [data-skin] .modesw button { color: var(--muted); }
 [data-skin] .modesw button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: var(--raised-sm); }
+.row.hint { min-height: 0; padding-top: 0; font-size: 13px; color: var(--muted); }
+.row.hint::before { display: none; }
 .ask { font-family: var(--f-display); font-weight: 700; }
 /* Soft UI (from the Default theme, after Court Finder) in every theme: cards take the court colour and stick out,
    fields are pressed in. Each theme keeps its own colours; applyCourt() sets the per-theme values. */
@@ -301,7 +303,7 @@ const STR = {
     payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", payeeMode: "Penerima adalah", fromPlayers: "Pemain", otherName: "Lainnya", payeeOtherName: "Nama penerima", payeeOtherNote: "Penerima bukan pemain, jadi tidak ikut dibagi biaya. Semua pemain ditagih penuh.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
     hoursPlayed: "Jam main", hours: h => `${h} jam`, addPartial: "+ Pemain tidak main full", noName: "(tanpa nama)", del: "Hapus", less: "Kurangi", more: "Tambah",
     partialNote: h => `Semua pemain dianggap main penuh ${h} jam. Tambahkan hanya yang tidak full; dianggap main dari awal.`,
-    cost: "Biaya", amount: "Nominal", perHour: "Per jam", equal: "Rata", addCost: "+ Tambah biaya", rounding: "Pembulatan per orang", rNone: "Tidak", rUp: "Ke atas 1rb", rDown: "Ke bawah 1rb", newCost: "Lain-lain",
+    cost: "Biaya", amount: "Nominal", perHour: "Per jam", equal: "Rata", perHourHint: "Per jam: dibagi sesuai lama main tiap pemain.", equalHint: "Rata: dibagi sama besar ke semua pemain.", allFull: "Semua pemain main penuh, jadi setiap biaya dibagi rata. Pilihan Per jam muncul kalau ada pemain yang tidak main full.", addCost: "+ Tambah biaya", rounding: "Pembulatan per orang", rNone: "Tidak", rUp: "Ke atas 1rb", rDown: "Ke bawah 1rb", newCost: "Lain-lain",
     foodOn: "Ada pembagian makanan", food: "Makanan", foodName: "Nama makanan", price: "Harga", each: "Per orang", shared: "Dibagi", addFood: "+ Tambah makanan",
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
@@ -326,7 +328,7 @@ const STR = {
     payeeNote: "The payee is included in the split but left out of the message.", payeeMode: "Payee is", fromPlayers: "A player", otherName: "Other", payeeOtherName: "Payee name", payeeOtherNote: "The payee is not a player, so they are left out of the split. Every player is billed in full.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
     partialNote: h => `Everyone is counted for the full ${h} hours. Add only players who left early; they are counted from the start.`,
-    cost: "Cost", amount: "Amount", perHour: "Per hour", equal: "Equal", addCost: "+ Add cost", rounding: "Rounding per person", rNone: "None", rUp: "Up to 1k", rDown: "Down to 1k", newCost: "Other",
+    cost: "Cost", amount: "Amount", perHour: "Per hour", equal: "Equal", perHourHint: "Per hour: split by how long each player played.", equalHint: "Equal: split evenly among all players.", allFull: "Everyone played the full session, so every cost is split evenly. Per hour shows up when someone left early.", addCost: "+ Add cost", rounding: "Rounding per person", rNone: "None", rUp: "Up to 1k", rDown: "Down to 1k", newCost: "Other",
     foodOn: "Split food", food: "Food", foodName: "Food name", price: "Price", each: "Each", shared: "Shared", addFood: "+ Add food",
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
@@ -651,13 +653,17 @@ function viewPemain(T) {
     <p class="foot">${T.partialNote(fullHours())}</p>` : ""}`;
 }
 
+// Per jam only changes anything when someone did not play the whole session.
+const anyPartial = () => S.partial.some(q => S.players.some(p => p.id === q.player) && q.hours < fullHours());
 function viewBiaya(T) {
-  return S.costs.map(c => `
+  const choose = anyPartial();
+  return (choose ? "" : `<p class="foot" style="margin:6px 16px 4px">${T.allFull}</p>`) + S.costs.map(c => `
     <div class="group-title"><span>${esc(c.name || T.cost)}</span><button type="button" class="danger" data-del-cost="${c.id}">${T.del}</button></div>
     <div class="group">
       <div class="row"><label>${T.name}</label><input aria-label="${T.name}" data-col="costs" data-id="${c.id}" data-k="name" value="${esc(c.name)}"></div>
       <div class="row"><label>${T.amount}</label><span class="rp">Rp</span><input aria-label="${T.amount}" class="money" inputmode="numeric" data-col="costs" data-id="${c.id}" data-k="amount" value="${money(c.amount)}" placeholder="0"></div>
-      <div class="row">${seg(`data-col="costs" data-id="${c.id}" data-k="split"`, c.split, [["hours", T.perHour], ["equal", T.equal]])}</div>
+      ${choose ? `<div class="row">${seg(`data-col="costs" data-id="${c.id}" data-k="split"`, c.split, [["hours", T.perHour], ["equal", T.equal]])}</div>
+      <div class="row hint">${c.split === "hours" ? T.perHourHint : T.equalHint}</div>` : ""}
     </div>`).join("") + `
     <div class="group" style="margin-top:18px"><div class="row"><button type="button" class="addrow" id="add-cost">${T.addCost}</button></div></div>
     <div class="group-title">${T.rounding}</div>
