@@ -58,11 +58,13 @@ body { background: var(--page); color: var(--fg); font-family: var(--f); font-si
 .status .icons { display: flex; gap: 6px; align-items: center; }
 @media (max-width: 520px) {
   .side { display: none; }
-  .stage { padding: 0; display: block; }
-  .phone { width: 100%; height: 100dvh; border-radius: 0; padding: 0; box-shadow: none; background: var(--court); }
+  html, body { overflow: hidden; }
+  .stage { padding: 0; display: block; min-height: 0; }
+  /* Full screen on a phone: pinned to the window so the page itself never scrolls under the status bar. */
+  .phone { position: fixed; inset: 0; width: auto; height: auto; max-width: none; border-radius: 0; padding: 0; box-shadow: none; background: var(--court); }
   .screen { border-radius: 0; }
   .status { display: none; }
-  .nav { padding-top: max(8px, env(safe-area-inset-top, 0px)); }
+  .lawn .nav { padding-top: calc(env(safe-area-inset-top, 0px) + 8px); }
 }
 .nav { padding: 4px 16px 24px 20px; display: flex; align-items: center; gap: 14px; }
 .nav img { width: 48px; height: 48px; border-radius: 12px; box-shadow: 0 0 0 2px var(--chalk); flex: 0 0 auto; }
