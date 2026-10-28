@@ -1,5 +1,5 @@
 // Offline support: app files are cached on install; Google Fonts are cached the first time they load.
-const CACHE = "bagi-rata-v17";
+const CACHE = "bagi-rata-v18";
 const FILES = ["./", "index.html", "langkah.html", "manifest.webmanifest", "manifest-langkah.webmanifest", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, { cache: "reload" }))))); self.skipWaiting(); });
 self.addEventListener("activate", e => {
