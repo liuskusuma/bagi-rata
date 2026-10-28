@@ -107,7 +107,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 .link { color: var(--accent); }
 .danger { color: var(--danger); font-size: 15px; }
-.group-title .danger { color: #ffe1dc; text-shadow: none; background: rgba(120, 20, 10, .6); padding: 3px 12px; border-radius: 99px; font-family: var(--f); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; }
+.group-title .danger { color: #ffe1dc; text-shadow: none; background: rgba(120, 20, 10, .6); width: 32px; height: 28px; padding: 0; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; }
+.group-title .danger svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .group-title .pill { text-shadow: none; }
 .addrow { color: var(--accent); width: 100%; text-align: left; }
 .minus { width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: #fff; flex: 0 0 auto; display: grid; place-items: center; font-weight: 700; line-height: 1; }
@@ -684,7 +685,7 @@ const anyPartial = () => S.partial.some(q => S.players.some(p => p.id === q.play
 function viewBiaya(T) {
   const choose = anyPartial();
   return (choose ? "" : `<p class="foot" style="margin:6px 16px 4px">${T.allFull}</p>`) + S.costs.map(c => `
-    <div class="group-title"><span>${esc(c.name || T.cost)}</span><button type="button" class="danger" data-del-cost="${c.id}">${T.del}</button></div>
+    <div class="group-title"><span>${esc(c.name || T.cost)}</span><button type="button" class="danger" data-del-cost="${c.id}" aria-label="${T.del} ${esc(c.name || T.cost)}">${TRASH}</button></div>
     <div class="group">
       <div class="row"><label>${T.name}</label><input aria-label="${T.name}" data-col="costs" data-id="${c.id}" data-k="name" value="${esc(c.name)}"></div>
       <div class="row"><label>${T.amount}</label><span class="rp">Rp</span><input aria-label="${T.amount}" class="money" inputmode="numeric" data-col="costs" data-id="${c.id}" data-k="amount" value="${money(c.amount)}" placeholder="0"></div>
@@ -702,7 +703,7 @@ function viewMakanan(T) {
     <div class="group" style="margin-top:6px"><div class="row"><span class="lbl ask">${T.foodAsk}</span>
       <button type="button" class="switch" role="switch" id="food-switch" aria-checked="${!!S.foodOn}" aria-label="${T.foodAsk}"></button></div></div>
     ${S.foodOn ? `<button type="button" class="btn btn-scan" id="scan-bill"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>${T.scan}</button>` + S.foodItems.map(f => `
-      <div class="group-title"><span>${esc(f.name || T.food)}</span><button type="button" class="danger" data-del-food="${f.id}">${T.del}</button></div>
+      <div class="group-title"><span>${esc(f.name || T.food)}</span><button type="button" class="danger" data-del-food="${f.id}" aria-label="${T.del} ${esc(f.name || T.food)}">${TRASH}</button></div>
       <div class="group">
         <div class="row"><label>${T.name}</label><input aria-label="${T.foodName}" data-col="foodItems" data-id="${f.id}" data-k="name" value="${esc(f.name)}" placeholder="${T.foodName}"></div>
         <div class="row"><label>${T.price}</label><span class="rp">Rp</span><input aria-label="${T.price}" class="money" inputmode="numeric" data-col="foodItems" data-id="${f.id}" data-k="price" value="${money(f.price)}" placeholder="0"></div>
@@ -937,6 +938,7 @@ function sheetProgress(text, pct) { sheet(`<h3>${esc(text)}</h3><div class="bar"
 // Bills read best around 1800px wide: small (chat-compressed) photos are enlarged, big ones reduced.
 // The photo is cropped to the paper (the bright part), turned grey and contrast-stretched; mode "bin" also applies
 // a local-mean threshold, which removes shadows and folds but can eat thin digits on blurry photos.
+const TRASH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
 async function prepImage(file, mode) {
   const img = await createImageBitmap(file);
   // Find the paper on a small copy: columns and rows whose average brightness is in the upper half.
