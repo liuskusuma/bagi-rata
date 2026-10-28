@@ -14,7 +14,7 @@ If the worker is not set up or fails, the app falls back to the on-phone reader 
 4. Settings, Variables and Secrets: add a **Secret** named `ANTHROPIC_API_KEY` with the key from step 1.
 5. Put the worker URL (`https://bagi-rata-scan.<account>.workers.dev`) in `AI_URL` in the app.
 
-Optional: bind a KV namespace as `LIMITS` to cap photos per visitor per day (`DAILY_LIMIT`, default 20),
+Optional: bind a KV namespace as `LIMITS` to cap photos per visitor per day (`DAILY_LIMIT`, default 5),
 `MODEL` to change the model, `ALLOWED_ORIGINS` (comma separated) to allow more sites.
 
 ## Develop

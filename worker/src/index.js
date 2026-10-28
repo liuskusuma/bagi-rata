@@ -59,13 +59,13 @@ function cors(origin) {
 }
 const reply = (body, status, origin) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", ...cors(origin) } });
 
-// Optional daily limit per visitor, if a KV namespace is bound as LIMITS (DAILY_LIMIT, default 20).
+// Optional daily limit per visitor, if a KV namespace is bound as LIMITS (DAILY_LIMIT, default 5).
 async function overLimit(env, request) {
   if (!env.LIMITS) return false;
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   const key = `${new Date().toISOString().slice(0, 10)}:${ip}`;
   const used = +(await env.LIMITS.get(key)) || 0;
-  if (used >= (+env.DAILY_LIMIT || 20)) return true;
+  if (used >= (+env.DAILY_LIMIT || 5)) return true;
   await env.LIMITS.put(key, String(used + 1), { expirationTtl: 172800 });
   return false;
 }
