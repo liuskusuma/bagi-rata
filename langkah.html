@@ -1037,7 +1037,7 @@ function parseBill(text) {
 }
 // AI reader: a small server (worker/ in the repo) sends the photo to Claude with the owner's API key.
 // Empty until the server is set up; if it fails or is busy, the on-phone reader below takes over.
-const AI_URL = "";
+const AI_URL = "https://bagi-rata-scan.liuskusuma.workers.dev/";
 // Claude reads photos best at about 1568px on the long side; a JPEG that size is a few hundred KB.
 async function photoData(file) {
   const img = await createImageBitmap(file), k = Math.min(1, 1568 / Math.max(img.width, img.height));
