@@ -579,6 +579,7 @@ function viewMatch(T) {
     <p class="foot">${T.matchNote}</p>`;
 }
 
+const courtsFoot = T => (S.courts.some(c => c.start) ? T.courtsNote(courtHours(), sessionStart(), sessionEnd()) + " " : "") + T.placeNote;
 function viewPlace(T) {
   return `
     <div class="group-title">${T.timePlace}</div>
@@ -591,12 +592,12 @@ function viewPlace(T) {
     <div class="group"${i ? ' style="margin-top:10px"' : ""}>
       <div class="row">${S.courts.length > 1 ? `<button type="button" class="minus" data-del-court="${c.id}" aria-label="${T.del}">−</button>` : ""}
         <input class="left" aria-label="${T.court}" data-col="courts" data-id="${c.id}" data-k="name" value="${esc(c.name)}" placeholder="${T.court}" style="font-weight:600"></div>
-      <div class="row"><label>${T.start}</label><input type="time" aria-label="${T.start}" data-col="courts" data-id="${c.id}" data-k="start" data-re value="${esc(c.start)}"></div>
+      <div class="row"><label>${T.start}</label><input type="time" aria-label="${T.start}" data-col="courts" data-id="${c.id}" data-k="start" value="${esc(c.start)}"></div>
       <div class="row"><span class="lbl">${T.length}</span>
         <div class="stepper"><button type="button" data-court-step="-0.5" data-id="${c.id}" aria-label="${T.less}">−</button><span>${T.hours(c.hours)}</span><button type="button" data-court-step="0.5" data-id="${c.id}" aria-label="${T.more}">+</button></div></div>
     </div>`).join("")}
     <div class="group" style="margin-top:10px"><div class="row"><button type="button" class="addrow" id="add-court">${T.addCourt}</button></div></div>
-    <p class="foot">${S.courts.some(c => c.start) ? T.courtsNote(courtHours(), sessionStart(), sessionEnd()) + " " : ""}${T.placeNote}</p>
+    <p class="foot" id="courts-note">${courtsFoot(T)}</p>
 `;
 }
 
@@ -648,8 +649,8 @@ function viewBiaya(T) {
       <div class="row"><label>${T.name}</label><input aria-label="${T.name}" data-col="costs" data-id="${c.id}" data-k="name" value="${esc(c.name)}"></div>
       <div class="row"><label>${T.amount}</label><span class="rp">Rp</span><input aria-label="${T.amount}" class="money" inputmode="numeric" data-col="costs" data-id="${c.id}" data-k="amount" value="${money(c.amount)}" placeholder="0"></div>
       ${choose ? `<div class="row">${seg(`data-col="costs" data-id="${c.id}" data-k="split"`, c.split, [["hours", T.perHour], ["equal", T.equal]])}</div>
-      <div class="row hint">${c.split === "hours" ? T.perHourHint : T.equalHint}</div>` : ""}
-    </div>`).join("") + `
+` : ""}
+    </div>${choose ? `<p class="foot">${c.split === "hours" ? T.perHourHint : T.equalHint}</p>` : ""}`).join("") + `
     <div class="group" style="margin-top:18px"><div class="row"><button type="button" class="addrow" id="add-cost">${T.addCost}</button></div></div>
     <div class="group-title">${T.rounding}</div>
     <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>`;
@@ -806,6 +807,8 @@ function onEdit(e) {
   } else if (el.dataset.col) {
     const item = S[el.dataset.col].find(x => x.id === el.dataset.id);
     item[el.dataset.k] = el.classList.contains("money") ? num(el.value) : el.value;
+    // Start times update the note in place: a re-render while the iOS time wheel is open would close it.
+    if (el.type === "time" && $("courts-note")) $("courts-note").textContent = courtsFoot(L());
     if (e.type === "change" && el.dataset.re !== undefined) render(true);
   } else if (el.dataset.payee !== undefined) {
     const v = el.value.trim(), p = S.players.find(x => x.id === S.payer);
