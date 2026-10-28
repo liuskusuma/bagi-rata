@@ -8,7 +8,8 @@ Mockup interaktif: https://claude.ai/artifact/EWQwWxcidMEcT5BV6aMee3
 
 | Folder / file | Isi |
 |---|---|
-| `icon/Logo_BagiRata.jpeg` | Icon asli, huruf BR putih kapur di atas rumput |
+| `icon/Logo_BagiRata.jpeg` | Icon (sejak 28 Okt 2026): huruf BR putih dengan kaki R kuning di atas biru navy |
+| `icon/Logo_BagiRata-rumput.jpeg` | Icon lama: huruf BR putih kapur di atas rumput |
 | `icon/icon-1024.png`, `icon-180.png`, `icon-120.png` | Ukuran untuk App Store (1024) dan layar iPhone (180, 120) |
 | `textures/` | Tekstur latar untuk tiap tema lapangan, bisa diulang tanpa sambungan |
 | `tokens.json` | Semua angka desain (warna, font, ukuran, radius) dalam format yang bisa dibaca developer |
