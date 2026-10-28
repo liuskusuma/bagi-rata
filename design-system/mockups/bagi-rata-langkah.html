@@ -277,14 +277,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; bo
 const STR = {
   id: {
     tabs: { sesi: "Sesi", match: "Pertandingan", place: "Waktu & Tempat", pay: "Pembayaran", players: "Pemain", cost: "Biaya", food: "Makanan", bill: "Tagihan", setelan: "Setelan" },
-    subs: { sesi: "Detail pertandingan", match: "Judul dan lawan", place: "Tanggal, tempat, lapangan", pay: "Rekening dan penerima", players: "Nama dan jam main", cost: "Lapangan, ballboy, bola", food: "Kalau ada", bill: "Kirim ke grup WhatsApp", setelan: "Tampilan, bahasa, tema" },
+    subs: { sesi: "Detail pertandingan", match: "Judul dan lawan", place: "Tanggal, tempat, lapangan", pay: "Rekening bank", players: "Nama dan jam main", cost: "Lapangan, ballboy, bola", food: "Kalau ada", bill: "Kirim ke grup WhatsApp", setelan: "Tampilan, bahasa, tema" },
     stepOf: (i, n) => `Langkah ${i} dari ${n}`, mode: "Tampilan", guided: "Terpandu", standard: "Standar", modeNote: "Terpandu: isi satu halaman per langkah sampai Tagihan. Standar: semua bagian lewat tab di bawah. Bisa juga diganti lewat tombol di sebelah roda gigi.", next: s => `Lanjut: ${s}`, back: "Kembali", done: "Selesai", newBill: "Tagihan baru", newConfirm: "Hapus semua isian dan mulai tagihan baru?",
     matchNote: "Judul jadi baris pertama pesan. Lawan boleh dikosongkan.", placeNote: "Main di lebih dari satu lapangan? Tambahkan lapangannya, masing-masing dengan jam mulai dan durasinya.",
-    payeeName: "Nama penerima", payNote: "Penerima otomatis masuk daftar pemain dan ikut dihitung, tapi tidak ditagih di pesan.",
+    payeeName: "Nama penerima", payNote: "Rekening ini muncul di baris terakhir pesan. Semua pemain ikut ditagih.",
     hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", foodSkip: "Tidak ada makanan? Langsung lanjut ke Tagihan.", needPlayers: "Belum ada pemain. Tambahkan dulu di langkah Pemain.",
     match: "Pertandingan", title: "Judul", vs: "Lawan", optional: "Opsional", timePlace: "Waktu dan tempat", date: "Tanggal", venue: "Tempat", court: "Lapangan",
     start: "Mulai", end: "Selesai", duration: h => `Durasi ${h} jam.`, courts: "Lapangan", length: "Durasi", addCourt: "+ Tambah lapangan", courtN: n => `Lapangan ${n}`,
-    courtsNote: (ch, a, b) => `Total ${ch} jam lapangan, ${a}–${b}. Biaya "Per jam" dibagi menurut jam lapangan yang dipakai di tiap jam.`, courtHours: "jam lapangan", crt: "lap", payment: "Pembayaran", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
+    courtsNote: (ch, a, b) => `Total ${ch} jam lapangan, ${a}–${b}. Biaya "Per jam" dibagi menurut jam lapangan yang dipakai di tiap jam.`, courtHours: "jam lapangan", crt: "lap", payment: "Pembayaran", bankName: "Nama bank", bankNo: "No. rekening", bankHolder: "Atas nama", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
     payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", payeeMode: "Penerima adalah", fromPlayers: "Pemain", otherName: "Lainnya", payeeOtherName: "Nama penerima", payeeOtherNote: "Penerima bukan pemain, jadi tidak ikut dibagi biaya. Semua pemain ditagih penuh.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
     hoursPlayed: "Jam main", hours: h => `${h} jam`, addPartial: "+ Pemain tidak main full", noName: "(tanpa nama)", del: "Hapus", less: "Kurangi", more: "Tambah",
     partialNote: h => `Semua pemain dianggap main penuh ${h} jam. Tambahkan hanya yang tidak full; dianggap main dari awal.`,
@@ -302,14 +302,14 @@ const STR = {
   },
   en: {
     tabs: { sesi: "Session", match: "Match", place: "Time & Place", pay: "Payment", players: "Players", cost: "Costs", food: "Food", bill: "Bill", setelan: "Settings" },
-    subs: { sesi: "Match details", match: "Title and opponent", place: "Date, venue, courts", pay: "Bank account and payee", players: "Names and hours", cost: "Court, ball boy, balls", food: "If any", bill: "Send to the WhatsApp group", setelan: "Layout, language, theme" },
+    subs: { sesi: "Match details", match: "Title and opponent", place: "Date, venue, courts", pay: "Bank account", players: "Names and hours", cost: "Court, ball boy, balls", food: "If any", bill: "Send to the WhatsApp group", setelan: "Layout, language, theme" },
     stepOf: (i, n) => `Step ${i} of ${n}`, mode: "Layout", guided: "Guided", standard: "Standard", modeNote: "Guided: one page per step until the Bill. Standard: every section in the tabs at the bottom. You can also switch with the button next to the gear.", next: s => `Next: ${s}`, back: "Back", done: "Done", newBill: "New bill", newConfirm: "Clear everything and start a new bill?",
     matchNote: "The title is the first line of the message. Opponent is optional.", placeNote: "Played on more than one court? Add each court with its own start time and duration.",
-    payeeName: "Payee name", payNote: "The payee is added to the players and included in the split, but not billed in the message.",
+    payeeName: "Payee name", payNote: "This account is the last line of the message. Every player is billed.",
     hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", foodSkip: "No food? Go straight to the Bill.", needPlayers: "No players yet. Add them in the Players step first.",
     match: "Match", title: "Title", vs: "Opponent", optional: "Optional", timePlace: "Time and place", date: "Date", venue: "Venue", court: "Court",
     start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Courts", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
-    courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bank: "Bank account", payee: "Payee", none: "None",
+    courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bankName: "Bank", bankNo: "Account no.", bankHolder: "Account name", bank: "Bank account", payee: "Payee", none: "None",
     payeeNote: "The payee is included in the split but left out of the message.", payeeMode: "Payee is", fromPlayers: "A player", otherName: "Other", payeeOtherName: "Payee name", payeeOtherNote: "The payee is not a player, so they are left out of the split. Every player is billed in full.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
     partialNote: h => `Everyone is counted for the full ${h} hours. Add only players who left early; they are counted from the start.`,
@@ -417,7 +417,7 @@ const KEY = "bagi-rata-v3", PKEY = "bagi-rata-iphone-prefs", OLD_KEYS = ["bagi-r
 const SAMPLE = () => ({
   title: "", vs: "", date: "", venue: "",
   courts: [{ id: "k1", name: "Lapangan 1", start: "", hours: 2 }],
-  bank: "", round: "1000", payer: "", payerMode: "player", payerName: "",
+  bankName: "", bankNo: "", bankHolder: "", round: "1000",
   costs: [
     { id: "c1", name: "Lapangan", amount: 0, split: "hours" },
     { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
@@ -480,7 +480,7 @@ function clock(offset) {
   const t = ((Math.round(first + offset * 60) % 1440) + 1440) % 1440;
   return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
 }
-const PID = () => S.payerMode === "other" ? "" : S.payer;
+const PID = () => "";
 const hoursOf = p => { const x = S.partial.find(q => q.player === p.id); return x ? +x.hours || 0 : fullHours(); };
 const hasHourly = () => S.costs.some(c => c.split === "hours");
 
@@ -526,6 +526,8 @@ function compute() {
   const collected = rows.reduce((a, r) => a + (r.p.id === PID() ? 0 : r.final), 0);
   return { rows, costTotal, foodTotal, collected, allShares, payerShare: allShares - collected, segs, CH };
 }
+// "BCA 6300102008 a/n Winarto Kusuma", leaving out whatever is blank.
+const bankLine = () => [S.bankName, S.bankNo, S.bankHolder ? "a/n " + S.bankHolder : ""].map(x => (x || "").trim()).filter(Boolean).join(" ");
 function buildMessage(res) {
   const lines = S.title ? [S.title] : [];
   if (S.vs) lines.push("", "VS " + S.vs);
@@ -544,7 +546,7 @@ function buildMessage(res) {
   }
   lines.push("");
   for (const r of res.rows) if (r.p.name && r.p.id !== PID()) lines.push(`${r.p.name} - ${rb(r.final)}`);
-  if (S.bank) lines.push("", S.bank);
+  const bank = bankLine(); if (bank) lines.push("", bank);
   return lines.join("\n");
 }
 
@@ -602,17 +604,14 @@ function viewPlace(T) {
 }
 
 function viewPay(T) {
-  const payee = S.players.find(p => p.id === S.payer);
   return `
     <div class="group-title">${T.payment}</div>
     <div class="group">
-      <div class="row"><label for="s-bank">${T.bank}</label><input id="s-bank" data-s="bank" value="${esc(S.bank)}" placeholder="BCA 123 a/n Nama"></div>
-      <div class="row"><span class="lbl">${T.payeeMode}</span>${seg('data-s="payerMode" data-re', S.payerMode === "other" ? "other" : "player", [["player", T.fromPlayers], ["other", T.otherName]])}</div>
-      ${S.payerMode === "other"
-        ? `<div class="row"><label for="s-payer-name">${T.payee}</label><input id="s-payer-name" data-s="payerName" value="${esc(S.payerName)}" placeholder="${T.payeeOtherName}"></div>`
-        : `<div class="row"><label for="s-payee">${T.payee}</label><input id="s-payee" data-payee value="${esc(payee ? payee.name : "")}" placeholder="${T.payeeName}"></div>`}
+      <div class="row"><label for="s-bank-name">${T.bankName}</label><input id="s-bank-name" data-s="bankName" value="${esc(S.bankName)}" placeholder="BCA"></div>
+      <div class="row"><label for="s-bank-no">${T.bankNo}</label><input id="s-bank-no" data-s="bankNo" inputmode="numeric" value="${esc(S.bankNo)}" placeholder="6300102008"></div>
+      <div class="row"><label for="s-bank-holder">${T.bankHolder}</label><input id="s-bank-holder" data-s="bankHolder" value="${esc(S.bankHolder)}" placeholder="${T.name}"></div>
     </div>
-    <p class="foot">${S.payerMode === "other" ? T.payeeOtherNote : T.payNote}</p>`;
+    <p class="foot">${T.payNote}</p>`;
 }
 
 function viewPemain(T) {
@@ -698,7 +697,6 @@ function viewTagihan(T) {
     <div class="group">
       <div class="row"><span class="lbl">${T.totalCost}</span><span class="val">${rp(res.costTotal)}</span></div>
       <div class="row"><span class="lbl">${T.billed}</span><span class="val">${rp(res.collected)}</span></div>
-      <div class="row"><span class="lbl">${T.payeeShare}</span><span class="val">${rp(res.payerShare)}</span></div>
     </div>
     <div class="group-title">${T.perPlayer}</div>
     <div class="group">
@@ -884,6 +882,12 @@ $("content").addEventListener("keydown", e => {
 });
 
 // Older saves had one court with start/end; turn it into the courts list.
+function splitBank() {
+  if (S.bank === undefined) return;
+  const m = /^\s*(\S+)\s+([\d\s.-]+?)\s+a\/n\s+(.+)$/i.exec(S.bank || "");
+  if (m) { S.bankName = m[1]; S.bankNo = m[2].trim(); S.bankHolder = m[3].trim(); } else S.bankName = S.bank || "";
+  S.bankNo = S.bankNo || ""; S.bankHolder = S.bankHolder || ""; delete S.bank;
+}
 function migrateCourts() {
   if (S.courts) return;
   const t = s => { const [h, m] = (s || "0:0").split(":").map(Number); return h * 60 + m; };
@@ -901,7 +905,7 @@ const boot = data => {
   if (data && data.P) P = Object.assign(P, data.P);
   tab = tab === "setelan" ? tab : toMode(tab, P.mode);
   if (data && data.P) P = Object.assign(P, data.P);
-  migrateCourts(); dropCovered(); if (!S.payerMode) { S.payerMode = "player"; S.payerName = S.payerName || ""; } applyCourt(); render();
+  migrateCourts(); dropCovered(); splitBank(); if (!S.payerMode) { S.payerMode = "player"; S.payerName = S.payerName || ""; } applyCourt(); render();
   document.fonts?.ready?.then(fitTitle);
 };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
