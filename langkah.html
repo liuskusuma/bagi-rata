@@ -111,6 +111,8 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; bo
 .group-title .danger svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .group-title .pill { text-shadow: none; }
 .addrow { color: var(--accent); width: 100%; text-align: left; }
+.clear-page { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 18px auto 6px; padding: 8px 16px; border-radius: 99px; background: rgba(0, 0, 0, .28); color: var(--chalk); font-size: 14px; font-weight: 600; }
+.clear-page svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .minus { width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: #fff; flex: 0 0 auto; display: grid; place-items: center; font-weight: 700; line-height: 1; }
 .seg { display: flex; background: color-mix(in srgb, var(--muted) 18%, transparent); border-radius: 9px; padding: 2px; flex: 1 1 auto; }
 .seg button { flex: 1 1 0; font-size: 14px; white-space: nowrap; padding: 6px 8px; border-radius: 7px; color: var(--fg); }
@@ -314,7 +316,7 @@ const STR = {
   id: {
     tabs: { sesi: "Sesi", match: "Pertandingan", place: "Waktu & Tempat", pay: "Pembayaran", players: "Pemain", cost: "Biaya", food: "Makanan", bill: "Tagihan", setelan: "Setelan" },
     subs: { sesi: "Detail pertandingan", match: "Judul dan lawan", place: "Tanggal, tempat, lapangan", pay: "Rekening bank", players: "Nama dan jam main", cost: "Lapangan, ballboy, bola", food: "Kalau ada", bill: "Kirim ke grup WhatsApp", setelan: "Tampilan, bahasa, tema" },
-    stepOf: (i, n) => `Langkah ${i} dari ${n}`, mode: "Tampilan", guided: "Terpandu", standard: "Standar", modeNote: "Terpandu: isi satu halaman per langkah sampai Tagihan. Standar: semua bagian lewat tab di bawah. Bisa juga diganti lewat tombol di sebelah roda gigi.", next: s => `Lanjut: ${s}`, back: "Kembali", done: "Selesai", newBill: "Tagihan baru", newConfirm: "Hapus semua isian dan mulai tagihan baru?",
+    stepOf: (i, n) => `Langkah ${i} dari ${n}`, mode: "Tampilan", guided: "Terpandu", standard: "Standar", modeNote: "Terpandu: isi satu halaman per langkah sampai Tagihan. Standar: semua bagian lewat tab di bawah. Bisa juga diganti lewat tombol di sebelah roda gigi.", next: s => `Lanjut: ${s}`, back: "Kembali", done: "Selesai", newBill: "Tagihan baru", clearPage: "Kosongkan halaman ini", clearConfirm: t => `Kosongkan semua isian di halaman ${t}? Halaman lain tidak berubah.`, newConfirm: "Hapus semua isian dan mulai tagihan baru?",
     matchNote: "Judul jadi baris pertama pesan. Lawan boleh dikosongkan.", placeNote: "Main di lebih dari satu lapangan? Tambahkan lapangannya, masing-masing dengan jam mulai dan durasinya.",
     payeeName: "Nama penerima", payNote: "Rekening ini muncul di baris terakhir pesan. Semua pemain ikut ditagih.",
     hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", scan: "Foto bill makanan", scanReading: "Membaca bill…", scanAi: "AI sedang membaca bill…", aiLeft: n => `Sisa jatah AI hari ini: ${n} bill.`, aiOut: n => `Jatah AI hari ini (${n} bill) sudah habis, jadi bill ini dibaca dengan pembaca biasa. Besok bisa pakai AI lagi.`, scanLoading: "Menyiapkan pembaca (sekali saja, sekitar 8 MB)…",
@@ -342,7 +344,7 @@ const STR = {
   en: {
     tabs: { sesi: "Session", match: "Match", place: "Time & Place", pay: "Payment", players: "Players", cost: "Costs", food: "Food", bill: "Bill", setelan: "Settings" },
     subs: { sesi: "Match details", match: "Title and opponent", place: "Date, venue, courts", pay: "Bank account", players: "Names and hours", cost: "Court, ball boy, balls", food: "If any", bill: "Send to the WhatsApp group", setelan: "Layout, language, theme" },
-    stepOf: (i, n) => `Step ${i} of ${n}`, mode: "Layout", guided: "Guided", standard: "Standard", modeNote: "Guided: one page per step until the Bill. Standard: every section in the tabs at the bottom. You can also switch with the button next to the gear.", next: s => `Next: ${s}`, back: "Back", done: "Done", newBill: "New bill", newConfirm: "Clear everything and start a new bill?",
+    stepOf: (i, n) => `Step ${i} of ${n}`, mode: "Layout", guided: "Guided", standard: "Standard", modeNote: "Guided: one page per step until the Bill. Standard: every section in the tabs at the bottom. You can also switch with the button next to the gear.", next: s => `Next: ${s}`, back: "Back", done: "Done", newBill: "New bill", clearPage: "Clear this page", clearConfirm: t => `Clear everything on the ${t} page? Other pages stay as they are.`, newConfirm: "Clear everything and start a new bill?",
     matchNote: "The title is the first line of the message. Opponent is optional.", placeNote: "Played on more than one court? Add each court with its own start time and duration.",
     payeeName: "Payee name", payNote: "This account is the last line of the message. Every player is billed.",
     hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", scan: "Photo of the food bill", scanReading: "Reading the bill…", scanAi: "AI is reading the bill…", aiLeft: n => `AI reads left today: ${n}.`, aiOut: n => `Today's AI limit (${n} bills) is used up, so this bill was read by the basic reader. AI is back tomorrow.`, scanLoading: "Getting the reader ready (first time only, about 8 MB)…",
@@ -773,6 +775,17 @@ function viewSetelan(T) {
 }
 const safeTile = (kind, base) => { try { return tile(kind, base); } catch (e) { return "none"; } };
 
+// "Clear this page" empties only the fields shown on the current page; the other pages keep their entries.
+const CLEARS = {
+  match: () => { S.title = ""; S.vs = ""; },
+  place: () => { const b = SAMPLE(); S.date = ""; S.venue = ""; S.courts = b.courts; },
+  pay: () => { S.bankName = ""; S.bankNo = ""; S.bankHolder = ""; },
+  sesi: () => { CLEARS.match(); CLEARS.place(); CLEARS.pay(); },
+  players: () => { S.players = []; S.partial = []; for (const f of S.foodItems) f.who = []; },
+  cost: () => { S.costs = SAMPLE().costs; },
+  food: () => { S.foodItems = []; S.foodOn = false; }
+};
+const clearBtn = T => CLEARS[tab] ? `<button type="button" class="clear-page" id="clear-page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>${T.clearPage}</button>` : "";
 const VIEWS = { sesi: T => viewMatch(T) + viewPlace(T) + viewPay(T), match: viewMatch, place: viewPlace, pay: viewPay, players: viewPemain, cost: viewBiaya, food: viewMakanan, bill: viewTagihan, setelan: viewSetelan };
 
 function renderChrome() {
@@ -792,7 +805,7 @@ function render(keepScroll) {
   $("nav-title").textContent = T.tabs[tab];
   $("nav-sub").textContent = i >= 0 ? `${T.stepOf(i + 1, STEPS.length)} · ${T.subs[tab]}` : T.subs[tab];
   $("progress").innerHTML = STEPS.map((k, j) => `<button type="button" data-tab="${k}" class="${j <= i ? "done" : ""}" aria-label="${T.tabs[k]}"${k === tab ? ' aria-current="step"' : ""}></button>`).join("");
-  content.innerHTML = VIEWS[tab](T);
+  content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
   $("tabs").innerHTML = i < 0 ? `<button type="button" class="next" data-tab="${back}">${T.done}</button>`
     : (i > 0 ? `<button type="button" class="prev" data-tab="${STEPS[i - 1]}">‹ ${T.back}</button>` : "")
@@ -806,7 +819,7 @@ function renderTabs(keepScroll) {
   $("nav-title").textContent = T.tabs[tab];
   $("nav-sub").textContent = T.subs[tab];
   $("progress").hidden = true;
-  content.innerHTML = VIEWS[tab](T);
+  content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
   $("tabs").className = "tabs";
   $("tabs").innerHTML = TABS.map(k => `<button type="button" data-tab="${k}"${k === tab ? ' aria-current="page"' : ""}>${TAB_ICON[k]}<span>${T.tabs[k]}</span></button>`).join("");
@@ -916,6 +929,12 @@ $("progress").addEventListener("click", goStep);
 $("modesw").addEventListener("click", e => { const b = e.target.closest("[data-mode]"); if (b) { setMode(b.dataset.mode); render(); } });
 $("gear").onclick = () => { if (tab === "setelan") tab = back; else { back = tab; tab = "setelan"; } render(); };
 $("summary").onclick = () => { tab = "bill"; render(); };
+$("content").addEventListener("click", e => {
+  if (!e.target.closest("#clear-page") || !CLEARS[tab]) return;
+  const T = L();
+  if (!confirm(T.clearConfirm(T.tabs[tab]))) return;
+  CLEARS[tab](); open = null; render();
+});
 $("reset").onclick = () => { S = SAMPLE(); open = null; tab = guided() ? "match" : "sesi"; render(); };
 // Enter on a player name adds the next player; on other fields it just closes the keyboard.
 $("content").addEventListener("keydown", e => {
