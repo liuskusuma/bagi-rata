@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -352,7 +352,7 @@ const STR = {
     scanNone: "No food items could be read. Try a closer, straighter, brighter photo, or add them by hand.", scanFail: "Could not read the photo. The first use needs internet to download the reader.",
     scanExtra: amt => `Add tax & service (${amt}) to each item's price`, scanAdd: n => `Add ${n} items`, qty: "Quantity", scanCount: (n, q) => `The bill lists ${n} items, ${q} were read. Check the quantities.`, scanTotal: t => `Total read ${t}.`, scanMatch: t => `Total read ${t}, matches the bill subtotal.`, scanDiff: (t, b) => `Total read ${t}, differs from the bill subtotal ${b}. Check for a misread price.`, cancel: "Cancel", retry: "Retake", foodSkip: "No food? Go straight to the Bill.", needPlayers: "No players yet. Add them in the Players step first.",
     match: "Match", title: "Title", vs: "Opponent", optional: "Optional", timePlace: "Time and place", date: "Date", venue: "Venue", court: "Court",
-    start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Venue", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
+    start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Courts", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
     courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bankName: "Bank", bankNo: "Account no.", bankHolder: "Account name", bank: "Bank account", payee: "Payee", none: "None",
     payeeNote: "The payee is included in the split but left out of the message.", payeeMode: "Payee is", fromPlayers: "A player", otherName: "Other", payeeOtherName: "Payee name", payeeOtherNote: "The payee is not a player, so they are left out of the split. Every player is billed in full.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
@@ -373,11 +373,11 @@ const STR = {
 
 // ---------- Court themes ----------
 const COURTS = {
+  cf: { muted: "#8e9cc6", faint: "#5d6c9a", well: "#101d44", raiseL: "#1c3066", raiseD: "#0b1534", name: "Default", surf: "cf", tex: "none", deep: "#0b1534", base: "#14234f", hi: "#1c3066", head: "#14234f", accent: "#fbc02d", accentDark: "#fbc02d" },
   wimbledon: { muted: "#b5d48f", faint: "#6f9a45", name: "Wimbledon", surf: "grass", tex: "grass", deep: "#193e0c", base: "#2c580b", hi: "#497718", head: "#193e0c", accent: "#3a7012", accentDark: "#8cc63f", stripes: true },
   rg: { muted: "#f3c3aa", faint: "#e09a78", name: "Roland-Garros", surf: "clay", tex: "clay", deep: "#6e2a10", base: "#b4512a", hi: "#c8693c", head: "#7a3014", accent: "#a8431d", accentDark: "#f2925f" },
   ao: { muted: "#b3d1f2", faint: "#7fb0e3", name: "Australian Open", surf: "hard", tex: "hard", deep: "#0b3d70", base: "#1766b3", hi: "#3080cb", head: "#0d4a86", accent: "#1462ad", accentDark: "#6ab4ff" },
-  uso: { muted: "#b4cdea", faint: "#7fa2cc", name: "US Open", surf: "hard", tex: "hard", deep: "#1c3a62", base: "#2e5c90", hi: "#4170a6", head: "#4c7d43", accent: "#2a5a8f", accentDark: "#82b6ee" },
-  cf: { muted: "#8e9cc6", faint: "#5d6c9a", well: "#101d44", raiseL: "#1c3066", raiseD: "#0b1534", name: "Default", surf: "cf", tex: "none", deep: "#0b1534", base: "#14234f", hi: "#1c3066", head: "#14234f", accent: "#fbc02d", accentDark: "#fbc02d" }
+  uso: { muted: "#b4cdea", faint: "#7fa2cc", name: "US Open", surf: "hard", tex: "hard", deep: "#1c3a62", base: "#2e5c90", hi: "#4170a6", head: "#4c7d43", accent: "#2a5a8f", accentDark: "#82b6ee" }
 };
 const shade = (hex, a) => {
   const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(a < 0 ? v * (1 + a) : v + (255 - v) * a));
@@ -458,14 +458,15 @@ new MutationObserver(applyCourt).observe(document.documentElement, { attributes:
 // ---------- Data ----------
 const KEY = "bagi-rata-v3", PKEY = "bagi-rata-iphone-prefs", OLD_KEYS = ["bagi-rata-steps-v1", "bagi-rata-iphone-v2"];
 // New sessions start blank; the three usual cost rows are kept as named placeholders.
-const SAMPLE = () => ({
+// New bills start with names in the app language (English unless the phone chose Indonesian).
+const SAMPLE = (id = (P?.lang || "en") === "id") => ({
   title: "", vs: "", date: "", venue: "",
-  courts: [{ id: "k1", name: "Lapangan 1", start: "", hours: 2 }],
+  courts: [{ id: "k1", name: id ? "Lapangan 1" : "Court 1", start: "", hours: 2 }],
   bankName: "", bankNo: "", bankHolder: "", round: "1000",
   costs: [
-    { id: "c1", name: "Lapangan", amount: 0, split: "hours" },
+    { id: "c1", name: id ? "Lapangan" : "Court", amount: 0, split: "hours" },
     { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
-    { id: "c3", name: "Bola baru", amount: 0, split: "equal" }
+    { id: "c3", name: id ? "Bola baru" : "New balls", amount: 0, split: "equal" }
   ],
   players: [],
   partial: [],
@@ -477,7 +478,7 @@ try { S = JSON.parse(localStorage.getItem(KEY) || OLD_KEYS.map(k => localStorage
 try { P = JSON.parse(localStorage.getItem(PKEY)) || {}; } catch (e) { P = {}; }
 // A link can pick the first layout (index.html?mode=guided); after that the person's own choice wins.
 try { const m = new URLSearchParams(location.search).get("mode"); if (!P.mode && (m === "guided" || m === "tabs")) P.mode = m; } catch (e) {}
-P = Object.assign({ lang: "id", court: "wimbledon", mode: "tabs" }, P);
+P = Object.assign({ lang: "en", court: "cf", mode: "tabs" }, P);
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(PKEY, JSON.stringify(P)); } catch (e) {} };
 const L = () => STR[P.lang] || STR.id;
 const uid = p => p + Math.random().toString(36).slice(2, 8);
