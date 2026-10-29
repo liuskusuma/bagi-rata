@@ -87,7 +87,12 @@ body { background: var(--page); color: var(--fg); font-family: var(--f); font-si
 .gear { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(0,0,0,.28); color: var(--chalk); flex: 0 0 auto; }
 .gear[aria-pressed="true"] { background: var(--chalk); color: var(--court-deep); }
 .gear svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.content { flex: 1 1 auto; overflow-y: auto; padding: 4px 16px 24px; -webkit-overflow-scrolling: touch; }
+.content { flex: 1 1 auto; overflow-y: auto; padding: 4px 16px 24px; -webkit-overflow-scrolling: touch; touch-action: pan-y pinch-zoom; }
+.content.slide-l { animation: slide-l .22s ease-out; }
+.content.slide-r { animation: slide-r .22s ease-out; }
+@keyframes slide-l { from { transform: translateX(36px); opacity: .4; } }
+@keyframes slide-r { from { transform: translateX(-36px); opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .content.slide-l, .content.slide-r { animation: none; } }
 .group-title { font-family: var(--f-display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--chalk); text-shadow: 0 1px 3px rgba(0,0,0,.7); margin: 18px 16px 6px; display: flex; justify-content: space-between; align-items: baseline; }
 .group-title:first-child { margin-top: 6px; }
 .group { background: var(--cell); border-radius: 16px; overflow: hidden; }
@@ -927,6 +932,24 @@ const goStep = e => {
   render();
 };
 $("tabs").addEventListener("click", goStep);
+// Swipe left or right on the page to go to the next or previous tab (or step in Guided).
+// Only a quick, mostly sideways swipe counts, so scrolling and dragging time wheels still work.
+let swipe = null;
+$("content").addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  swipe = e.touches.length === 1 && !e.target.closest('input[type="range"], .sheet') ? { x: t.clientX, y: t.clientY, at: Date.now() } : null;
+}, { passive: true });
+$("content").addEventListener("touchend", e => {
+  if (!swipe) return;
+  const t = e.changedTouches[0], dx = t.clientX - swipe.x, dy = t.clientY - swipe.y, quick = Date.now() - swipe.at < 700;
+  swipe = null;
+  if (!quick || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.7 || tab === "setelan") return;
+  const list = guided() ? STEPS : TABS, i = list.indexOf(tab), next = list[i + (dx < 0 ? 1 : -1)];
+  if (i < 0 || !next) return;
+  document.activeElement?.blur?.();
+  tab = next; render();
+  const c = $("content"); c.classList.remove("slide-l", "slide-r"); void c.offsetWidth; c.classList.add(dx < 0 ? "slide-l" : "slide-r");
+}, { passive: true });
 $("progress").addEventListener("click", goStep);
 $("modesw").addEventListener("click", e => { const b = e.target.closest("[data-mode]"); if (b) { setMode(b.dataset.mode); render(); } });
 $("gear").onclick = () => { if (tab === "setelan") tab = back; else { back = tab; tab = "setelan"; } render(); };
