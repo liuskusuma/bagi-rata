@@ -1111,8 +1111,9 @@ function parseBill(text) {
 // Empty until the server is set up; if it fails or is busy, the on-phone reader below takes over.
 const AI_URL = "https://bagi-rata-scan.liuskusuma.workers.dev/";
 // Each phone gets 5 AI reads a day; after that the on-phone reader is used.
-const AI_LIMIT = 5, AI_KEY = "bagi-rata-ai-day";
 const today = () => new Date().toLocaleDateString("en-CA");
+// 31 Oct 2026: a fresh count of 10 for testing (new key), back to 5 a day after.
+const AI_LIMIT = today() === "2026-10-31" ? 10 : 5, AI_KEY = "bagi-rata-ai-day2";
 function aiUsed() { try { const u = JSON.parse(localStorage.getItem(AI_KEY)); return u && u.d === today() ? u.n : 0; } catch (e) { return 0; } }
 function aiCount() { try { localStorage.setItem(AI_KEY, JSON.stringify({ d: today(), n: aiUsed() + 1 })); } catch (e) {} }
 // Claude reads photos best at about 1568px on the long side; a JPEG that size is a few hundred KB.
