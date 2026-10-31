@@ -325,10 +325,10 @@ const STR = {
     stepOf: (i, n) => `Langkah ${i} dari ${n}`, mode: "Tampilan", guided: "Terpandu", standard: "Standar", modeNote: "Terpandu: isi satu halaman per langkah sampai Tagihan. Standar: semua bagian lewat tab di bawah. Bisa juga diganti lewat tombol di sebelah roda gigi.", next: s => `Lanjut: ${s}`, back: "Kembali", done: "Selesai", newBill: "Tagihan baru", clearPage: "Kosongkan halaman ini", clearConfirm: t => `Kosongkan semua isian di halaman ${t}? Halaman lain tidak berubah.`, newConfirm: "Hapus semua isian dan mulai tagihan baru?",
     matchNote: "Judul jadi baris pertama pesan. Lawan boleh dikosongkan.", placeNote: "Main di lebih dari satu lapangan? Tambahkan lapangannya, masing-masing dengan jam mulai dan durasinya.",
     payeeName: "Nama penerima", payNote: "Rekening ini muncul di baris terakhir pesan. Semua pemain ikut ditagih.",
-    hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", scan: "Foto bill makanan", scanReading: "Membaca bill…", scanAi: "AI sedang membaca bill…", aiLeft: n => `Sisa jatah AI hari ini: ${n} bill.`, aiOut: n => `Jatah AI hari ini (${n} bill) sudah habis, jadi bill ini dibaca dengan pembaca biasa. Besok bisa pakai AI lagi.`, scanLoading: "Menyiapkan pembaca (sekali saja, sekitar 8 MB)…",
+    hoursIf: "Jam main (kalau ada yang tidak full)", foodAsk: "Ada makanan yang dibagi?", svcTax: "Service & pajak", svc: "Service charge", tax: "Pajak 10%", foodSub: "Subtotal makanan", foodTotal: "Total makanan", svcTaxNote: "Service charge beda-beda tiap resto, isi sesuai bill (0 kalau tidak ada). Pajak 10% dihitung dari subtotal + service. Semuanya dibebankan ke tiap pesanan.", svcLine: (sv, tx) => [sv ? `service ${sv}%` : "", tx ? "pajak 10%" : ""].filter(Boolean).join(" + "), scanSvc: pct => `Pakai service charge dari bill: ${pct}%`, scan: "Foto bill makanan", scanReading: "Membaca bill…", scanAi: "AI sedang membaca bill…", aiLeft: n => `Sisa jatah AI hari ini: ${n} bill.`, aiOut: n => `Jatah AI hari ini (${n} bill) sudah habis, jadi bill ini dibaca dengan pembaca biasa. Besok bisa pakai AI lagi.`, scanLoading: "Menyiapkan pembaca (sekali saja, sekitar 8 MB)…",
     scanTitle: "Hasil baca bill", scanCheck: "Cek jumlah, nama, dan harga (harga = total baris), lalu hapus centang yang bukan makanan. Setelah ditambahkan, tinggal pilih siapa yang pesan.",
     scanNone: "Tidak ada makanan yang terbaca. Coba foto lebih dekat, lurus, dan terang, atau isi manual.", scanFail: "Gagal membaca foto. Pemakaian pertama butuh internet untuk mengunduh pembaca.",
-    scanExtra: amt => `Masukkan pajak & service (${amt}) ke harga tiap makanan`, scanAdd: n => `Tambahkan ${n} makanan`, qty: "Jumlah", scanCount: (n, q) => `Bill menulis ${n} porsi, terbaca ${q}. Cek kolom jumlah.`, scanTotal: t => `Total terbaca ${t}.`, scanMatch: t => `Total terbaca ${t}, cocok dengan subtotal bill.`, scanDiff: (t, b) => `Total terbaca ${t}, beda dengan subtotal bill ${b}. Cek harga yang salah baca.`, cancel: "Batal", retry: "Foto ulang", foodSkip: "Tidak ada makanan? Langsung lanjut ke Tagihan.", needPlayers: "Belum ada pemain. Tambahkan dulu di langkah Pemain.",
+    scanAdd: n => `Tambahkan ${n} makanan`, qty: "Jumlah", scanCount: (n, q) => `Bill menulis ${n} porsi, terbaca ${q}. Cek kolom jumlah.`, scanTotal: t => `Total terbaca ${t}.`, scanMatch: t => `Total terbaca ${t}, cocok dengan subtotal bill.`, scanDiff: (t, b) => `Total terbaca ${t}, beda dengan subtotal bill ${b}. Cek harga yang salah baca.`, cancel: "Batal", retry: "Foto ulang", foodSkip: "Tidak ada makanan? Langsung lanjut ke Tagihan.", needPlayers: "Belum ada pemain. Tambahkan dulu di langkah Pemain.",
     match: "Pertandingan", title: "Judul", vs: "Lawan", optional: "Opsional", timePlace: "Waktu dan tempat", date: "Tanggal", venue: "Tempat", court: "Lapangan",
     start: "Mulai", end: "Selesai", duration: h => `Durasi ${h} jam.`, courts: "Lapangan", length: "Durasi", addCourt: "+ Tambah lapangan", courtN: n => `Lapangan ${n}`,
     courtsNote: (ch, a, b) => `Total ${ch} jam lapangan, ${a}–${b}. Biaya "Per jam" dibagi menurut jam lapangan yang dipakai di tiap jam.`, courtHours: "jam lapangan", crt: "lap", payment: "Pembayaran", bankName: "Nama bank", bankNo: "No. rekening", bankHolder: "Atas nama", bank: "Rekening", payee: "Penerima", none: "Tidak ada",
@@ -353,10 +353,10 @@ const STR = {
     stepOf: (i, n) => `Step ${i} of ${n}`, mode: "Layout", guided: "Guided", standard: "Standard", modeNote: "Guided: one page per step until the Bill. Standard: every section in the tabs at the bottom. You can also switch with the button next to the gear.", next: s => `Next: ${s}`, back: "Back", done: "Done", newBill: "New bill", clearPage: "Clear this page", clearConfirm: t => `Clear everything on the ${t} page? Other pages stay as they are.`, newConfirm: "Clear everything and start a new bill?",
     matchNote: "The title is the first line of the message. Opponent is optional.", placeNote: "Played on more than one court? Add each court with its own start time and duration.",
     payeeName: "Payee name", payNote: "This account is the last line of the message. Every player is billed.",
-    hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", scan: "Photo of the food bill", scanReading: "Reading the bill…", scanAi: "AI is reading the bill…", aiLeft: n => `AI reads left today: ${n}.`, aiOut: n => `Today's AI limit (${n} bills) is used up, so this bill was read by the basic reader. AI is back tomorrow.`, scanLoading: "Getting the reader ready (first time only, about 8 MB)…",
+    hoursIf: "Hours played (if someone left early)", foodAsk: "Any food to split?", svcTax: "Service & tax", svc: "Service charge", tax: "Tax 10%", foodSub: "Food subtotal", foodTotal: "Food total", svcTaxNote: "Service charge differs per restaurant, so enter it from the bill (0 if none). The 10% tax is on subtotal + service. Both are added to each order.", svcLine: (sv, tx) => [sv ? `service ${sv}%` : "", tx ? "tax 10%" : ""].filter(Boolean).join(" + "), scanSvc: pct => `Use the service charge on the bill: ${pct}%`, scan: "Photo of the food bill", scanReading: "Reading the bill…", scanAi: "AI is reading the bill…", aiLeft: n => `AI reads left today: ${n}.`, aiOut: n => `Today's AI limit (${n} bills) is used up, so this bill was read by the basic reader. AI is back tomorrow.`, scanLoading: "Getting the reader ready (first time only, about 8 MB)…",
     scanTitle: "What the bill says", scanCheck: "Check quantity, name and price (price = line total) and untick anything that is not food. Then just pick who ordered each one.",
     scanNone: "No food items could be read. Try a closer, straighter, brighter photo, or add them by hand.", scanFail: "Could not read the photo. The first use needs internet to download the reader.",
-    scanExtra: amt => `Add tax & service (${amt}) to each item's price`, scanAdd: n => `Add ${n} items`, qty: "Quantity", scanCount: (n, q) => `The bill lists ${n} items, ${q} were read. Check the quantities.`, scanTotal: t => `Total read ${t}.`, scanMatch: t => `Total read ${t}, matches the bill subtotal.`, scanDiff: (t, b) => `Total read ${t}, differs from the bill subtotal ${b}. Check for a misread price.`, cancel: "Cancel", retry: "Retake", foodSkip: "No food? Go straight to the Bill.", needPlayers: "No players yet. Add them in the Players step first.",
+    scanAdd: n => `Add ${n} items`, qty: "Quantity", scanCount: (n, q) => `The bill lists ${n} items, ${q} were read. Check the quantities.`, scanTotal: t => `Total read ${t}.`, scanMatch: t => `Total read ${t}, matches the bill subtotal.`, scanDiff: (t, b) => `Total read ${t}, differs from the bill subtotal ${b}. Check for a misread price.`, cancel: "Cancel", retry: "Retake", foodSkip: "No food? Go straight to the Bill.", needPlayers: "No players yet. Add them in the Players step first.",
     match: "Match", title: "Title", vs: "Opponent", optional: "Optional", timePlace: "Time and place", date: "Date", venue: "Venue", court: "Court",
     start: "Start", end: "End", duration: h => `Duration ${h} ${h === 1 ? "hour" : "hours"}.`, courts: "Courts", length: "Duration", addCourt: "+ Add court", courtN: n => `Court ${n}`,
     courtsNote: (ch, a, b) => `${ch} court hours in total, ${a}–${b}. "Per hour" costs follow how many courts are in use each hour.`, courtHours: "court hours", crt: "ct", payment: "Payment", bankName: "Bank", bankNo: "Account no.", bankHolder: "Account name", bank: "Bank account", payee: "Payee", none: "None",
@@ -477,7 +477,9 @@ const SAMPLE = (id = (P?.lang || "en") === "id") => ({
   players: [],
   partial: [],
   foodOn: false,
-  foodItems: []
+  foodItems: [],
+  foodSvc: 0,
+  foodTax: true
 });
 let S, P;
 try { S = JSON.parse(localStorage.getItem(KEY) || OLD_KEYS.map(k => localStorage.getItem(k)).find(Boolean) || "null") || SAMPLE(); } catch (e) { S = SAMPLE(); }
@@ -535,10 +537,14 @@ const PID = () => "";
 const hoursOf = p => { const x = S.partial.find(q => q.player === p.id); return x ? +x.hours || 0 : fullHours(); };
 const hasHourly = () => S.costs.some(c => c.split === "hours");
 
+const svcPct = () => Math.max(0, Math.min(50, +String(S.foodSvc ?? 0).replace(",", ".") || 0));
+const foodRate = () => (1 + svcPct() / 100) * (S.foodTax ? 1.1 : 1);
 // Per-hour costs are split hour by hour among the players on court; early leavers count from the start.
 function compute() {
   const ps = S.players, T = L();
   const rows = ps.map(p => ({ p, parts: {}, food: 0, foodLines: [] }));
+  // Service and tax go on every order: tax is 10% of (subtotal + service), as Indonesian bills print it.
+  const fk = foodRate();
   if (S.foodOn) for (const f of S.foodItems) {
     const who = f.who.filter(id => ps.some(p => p.id === id)); if (!who.length) continue;
     const each = f.mode === "split" ? (+f.price || 0) / who.length : +f.price || 0;
@@ -546,6 +552,10 @@ function compute() {
       r.food += each;
       r.foodLines.push(f.mode === "split" ? `${f.name}: ${fmt(+f.price || 0)} ÷ ${who.length} ${T.people} = ${fmt(each)}` : `${f.name}: ${fmt(each)}`);
     }
+  }
+  if (fk !== 1) for (const r of rows) if (r.food) {
+    r.foodLines.push(`+ ${T.svcLine(svcPct(), S.foodTax)}: ${fmt(r.food * (fk - 1))}`);
+    r.food *= fk;
   }
   // Per-hour costs follow court-hours: each time slice costs (courts in use × its length) ÷ total court-hours,
   // shared by the players on court then. Players who left early count from the start.
@@ -706,6 +716,11 @@ function viewBiaya(T) {
     <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>`;
 }
 
+function foodSums(T) {
+  const sub = S.foodItems.reduce((a, f) => a + (+f.price || 0) * (f.mode === "split" ? 1 : Math.max(1, f.who.length)), 0);
+  const sv = sub * svcPct() / 100, tx = S.foodTax ? (sub + sv) * .1 : 0, line = (l, v, b) => `<div class="row"><span class="lbl"${b ? ' style="font-weight:700"' : ""}>${l}</span><span style="margin-left:auto${b ? ";font-weight:700" : ""}">${rp(Math.round(v))}</span></div>`;
+  return line(T.foodSub, sub) + (sv ? line(`${T.svc} ${svcPct()}%`, sv) : "") + (tx ? line(T.tax, tx) : "") + line(T.foodTotal, sub + sv + tx, true);
+}
 function viewMakanan(T) {
   return `
     ${S.players.length ? "" : `<p class="foot" style="margin-bottom:12px">${T.needPlayers}</p>`}
@@ -720,7 +735,14 @@ function viewMakanan(T) {
         <div class="chips">${S.players.map(p => `<button type="button" class="chip" data-food="${f.id}" data-p="${p.id}" aria-pressed="${f.who.includes(p.id)}">${pname(p)}</button>`).join("")}</div>
       </div>`).join("") + `
       <div class="group" style="margin-top:18px"><div class="row"><button type="button" class="addrow" id="add-food">${T.addFood}</button></div></div>
-      <p class="foot">${T.foodNote}</p>`
+      <p class="foot">${T.foodNote}</p>
+      <div class="group-title"><span>${T.svcTax}</span></div>
+      <div class="group">
+        <div class="row"><label>${T.svc}</label><input aria-label="${T.svc}" inputmode="decimal" data-s="foodSvc" data-re value="${esc(String(S.foodSvc ?? 0))}" placeholder="0" style="max-width:90px"><span class="rp">%</span></div>
+        <div class="row"><span class="lbl">${T.tax}</span><button type="button" class="switch" role="switch" id="food-tax" aria-checked="${!!S.foodTax}" aria-label="${T.tax}"></button></div>
+        ${foodSums(T)}
+      </div>
+      <p class="foot">${T.svcTaxNote}</p>`
     : `<p class="foot">${T.foodSkip}</p>`}`;
 }
 
@@ -790,7 +812,7 @@ const CLEARS = {
   sesi: () => { CLEARS.match(); CLEARS.place(); CLEARS.pay(); },
   players: () => { S.players = []; S.partial = []; for (const f of S.foodItems) f.who = []; },
   cost: () => { S.costs = SAMPLE().costs; },
-  food: () => { S.foodItems = []; S.foodOn = false; }
+  food: () => { S.foodItems = []; S.foodOn = false; S.foodSvc = 0; S.foodTax = true; }
 };
 const clearBtn = T => CLEARS[tab] ? `<button type="button" class="clear-page" id="clear-page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>${T.clearPage}</button>` : "";
 const VIEWS = { sesi: T => viewMatch(T) + viewPlace(T) + viewPay(T), match: viewMatch, place: viewPlace, pay: viewPay, players: viewPemain, cost: viewBiaya, food: viewMakanan, bill: viewTagihan, setelan: viewSetelan };
@@ -912,6 +934,7 @@ $("content").addEventListener("click", e => {
   else if (d.food) { const f = S.foodItems.find(x => x.id === d.food); f.who = f.who.includes(d.p) ? f.who.filter(x => x !== d.p) : f.who.concat(d.p); }
   else if (d.open) open = open === d.open ? null : d.open;
   else if (b.id === "food-switch") S.foodOn = !S.foodOn;
+  else if (b.id === "food-tax") S.foodTax = !S.foodTax;
   else if (b.id === "add-player") { S.players.push({ id: uid("p"), name: "" }); render(true); const ins = $("content").querySelectorAll('[data-col="players"]'); ins[ins.length - 1]?.focus(); return; }
   else if (b.id === "add-partial") { const free = S.players.find(p => !S.partial.some(q => q.player === p.id)); S.partial.push({ player: free.id, hours: Math.max(0, fullHours() - 1) }); }
   else if (b.id === "add-cost") S.costs.push({ id: uid("c"), name: T.newCost, amount: 0, split: "equal" });
@@ -983,6 +1006,9 @@ function sheetProgress(text, pct) { sheet(`<h3>${esc(text)}</h3><div class="bar"
 // The photo is cropped to the paper (the bright part), turned grey and contrast-stretched; mode "bin" also applies
 // a local-mean threshold, which removes shadows and folds but can eat thin digits on blurry photos.
 const TRASH = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>';
+const SVC = /serv|svc|\bs\.?c\b|layanan/i;
+// The service charge on the bill as a percentage of its subtotal, rounded to 0.5.
+const scanSvcPct = () => scan.svc && scan.subtotal ? Math.round(scan.svc / scan.subtotal * 200) / 2 : 0;
 async function prepImage(file, mode) {
   const img = await createImageBitmap(file);
   // Find the paper on a small copy: columns and rows whose average brightness is in the upper half.
@@ -1079,7 +1105,7 @@ function parseBill(text) {
   // When the items do not add up to the bill's subtotal, try the unit-price reading for lines where the two disagreed.
   const sum = () => items.reduce((a, i) => a + i.total, 0);
   if (subtotal) for (const it of items) if (it.alt && Math.abs(sum() - it.total + it.alt - subtotal) < Math.abs(sum() - subtotal)) it.total = it.alt;
-  return { items, extra: extras.reduce((a, e) => a + e.amount, 0), subtotal, count };
+  return { items, extra: extras.reduce((a, e) => a + e.amount, 0), svc: extras.filter(e => SVC.test(e.name)).reduce((a, e) => a + e.amount, 0), subtotal, count };
 }
 // AI reader: a small server (worker/ in the repo) sends the photo to Claude with the owner's API key.
 // Empty until the server is set up; if it fails or is busy, the on-phone reader below takes over.
@@ -1110,7 +1136,8 @@ async function readBillAi(file) {
     if (!Array.isArray(d.items)) return null;
     const items = d.items.filter(i => i && i.name && i.total > 0).map(i => ({ name: String(i.name).trim(), qty: Math.max(1, Math.round(+i.qty || 1)), total: Math.round(+i.total) }));
     const extra = (d.extras || []).reduce((a, e) => a + (Math.round(+e.amount) || 0), 0) - (Math.round(+d.discount) || 0);
-    return { items, extra: Math.max(0, extra), subtotal: Math.round(+d.subtotal) || 0, count: Math.round(+d.count) || 0, ai: true };
+    const svc = (d.extras || []).filter(e => SVC.test(e.label || "")).reduce((a, e) => a + (Math.round(+e.amount) || 0), 0);
+    return { items, extra: Math.max(0, extra), svc, subtotal: Math.round(+d.subtotal) || 0, count: Math.round(+d.count) || 0, ai: true };
   } catch (e) { return null; } finally { clearInterval(tick); }
 }
 async function readBill(file) {
@@ -1165,7 +1192,7 @@ function showScan() {
       <input class="sname" data-sn="${i}" value="${esc(it.name)}" aria-label="${T.foodName}">
       <input class="sqty" inputmode="numeric" data-sq="${i}" value="${it.qty}" aria-label="${T.qty}"><span class="qty">×</span><input class="money sprice" inputmode="numeric" data-sp="${i}" value="${money(it.total)}" aria-label="${T.price}"></div>`).join("")}
     <p class="muted" id="scan-sum" style="margin-top:10px">${scanSum()}</p>${scan.note ? `<p class="muted">${esc(scan.note)}</p>` : ""}
-    ${scan.extra ? `<div class="row"><input type="checkbox" id="scan-extra"${scan.withExtra ? " checked" : ""}><label for="scan-extra" style="flex:1 1 auto;font-size:14px">${T.scanExtra(rp(scan.extra))}</label></div>` : ""}
+    ${scanSvcPct() ? `<div class="row"><input type="checkbox" id="scan-svc" checked><label for="scan-svc" style="flex:1 1 auto;font-size:14px">${T.scanSvc(scanSvcPct())}</label></div>` : ""}
     <div class="btns"><button type="button" class="btn btn-copy" data-sheet="close">${T.cancel}</button><button type="button" class="btn btn-wa" data-sheet="add">${T.scanAdd(scan.items.length)}</button></div>`);
 }
 // Each line becomes one food item; "2× Es Teh 20.000" becomes Es Teh at 10.000 each, so two people can be ticked.
@@ -1175,9 +1202,8 @@ function addScanned() {
     if (!body.querySelector(`[data-si="${i}"]`).checked) return;
     keep.push({ name: body.querySelector(`[data-sn="${i}"]`).value.trim(), qty: Math.max(1, Math.min(30, num(body.querySelector(`[data-sq="${i}"]`).value) || 1)), total: num(body.querySelector(`[data-sp="${i}"]`).value) });
   });
-  const sum = keep.reduce((a, it) => a + it.total, 0), useExtra = scan.extra && body.querySelector("#scan-extra")?.checked;
-  const k = useExtra && sum ? 1 + scan.extra / sum : 1;
-  for (const it of keep) S.foodItems.push({ id: uid("f"), name: it.qty > 1 ? `${it.name} ×${it.qty}` : it.name, price: Math.round(it.total * k / it.qty), mode: "each", who: [] });
+  if (body.querySelector("#scan-svc")?.checked) S.foodSvc = scanSvcPct();
+  for (const it of keep) S.foodItems.push({ id: uid("f"), name: it.qty > 1 ? `${it.name} ×${it.qty}` : it.name, price: Math.round(it.total / it.qty), mode: "each", who: [] });
   S.foodOn = true; scan = null; sheet(""); render(true);
 }
 $("bill-file").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; if (f) readBill(f); });
@@ -1221,7 +1247,7 @@ const boot = data => {
   if (data && data.P) P = Object.assign(P, data.P);
   tab = tab === "setelan" ? tab : toMode(tab, P.mode);
   if (data && data.P) P = Object.assign(P, data.P);
-  migrateCourts(); dropCovered(); splitBank(); if (!S.payerMode) { S.payerMode = "player"; S.payerName = S.payerName || ""; } applyCourt(); render();
+  migrateCourts(); dropCovered(); splitBank(); if (S.foodSvc === undefined) { S.foodSvc = 0; S.foodTax = true; } if (!S.payerMode) { S.payerMode = "player"; S.payerName = S.payerName || ""; } applyCourt(); render();
   document.fonts?.ready?.then(fitTitle);
 };
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
