@@ -18,6 +18,10 @@ Folder ini berisi aplikasi Bagi Rata versi web yang bisa dipasang di iPhone lewa
 
 Data tiap orang (pemain, biaya, tema, bahasa) tersimpan di HP masing-masing.
 
+## Tenis dan Split Bill
+
+Saat aplikasi dibuka, pengguna memilih **Tenis** (lapangan, jam main, ballboy, bola, makanan) atau **Split Bill** (hanya orang, item nota, service/pajak, dan biaya lain yang dibagi rata). Isian kedua jenis disimpan terpisah. "Ingat pilihan saya" melewati layar pilihan; jenis tagihan bisa diganti lewat tombol di header atau di Setelan.
+
 ## Hosting
 
 Aplikasi ini hanya terdiri dari file statis, jadi bisa dipasang gratis di GitHub Pages:
