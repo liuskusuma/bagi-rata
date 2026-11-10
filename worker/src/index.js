@@ -1,6 +1,7 @@
 // Bagi Rata bill reader: the app posts a photo of a restaurant bill, Claude reads the items and prices.
 // The Anthropic API key lives only here (secret ANTHROPIC_API_KEY), so app users need no AI account.
 import Anthropic from "@anthropic-ai/sdk";
+import { handleClaim } from "./claim.js";
 
 const MODEL = "claude-sonnet-5-5";
 const MAX_IMAGE = 5 * 1024 * 1024; // base64 characters; the app sends about 300-600 KB
@@ -51,8 +52,8 @@ const PROMPT = `This is a photo of a restaurant or cafe bill, usually Indonesian
 function cors(origin) {
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Admin",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin"
   };
@@ -76,6 +77,10 @@ export default {
     const allowed = ORIGINS.concat((env.ALLOWED_ORIGINS || "").split(",").map(s => s.trim()).filter(Boolean));
     if (!allowed.includes(origin)) return new Response("Forbidden", { status: 403 });
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
+    if (new URL(request.url).pathname.startsWith("/claim")) {
+      try { return await handleClaim(request, env, cors(origin)); }
+      catch (e) { console.log("claim failed", e?.message); return reply({ error: "server" }, 500, origin); }
+    }
     if (request.method !== "POST") return reply({ error: "method" }, 405, origin);
 
     let image, mediaType;

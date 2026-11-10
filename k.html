@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Klaim makanan · Bagi Rata</title>
+<meta name="description" content="Buka link, pilih nama, centang yang kamu pesan. Tanpa install.">
+<meta property="og:title" content="Klaim makananmu · Bagi Rata">
+<meta property="og:description" content="Buka link, pilih nama, centang yang kamu pesan. Tanpa install.">
+<meta property="og:image" content="https://liuskusuma.github.io/bagi-rata/icons/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#14234f">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,700;0,800;1,800&display=swap">
+<style>
+/* Friends open this page from the WhatsApp link: no install, no account. Same look as the app's Default theme. */
+:root {
+  --base: #14234f; --well: #101d44; --rl: #1c3066; --rd: #0b1534; --fg: #f5f7fc; --muted: #8e9cc6; --faint: #5d6c9a;
+  --accent: #fbc02d; --ink: #14234f; --ok: #7fd6a4; --warn: #ffb27a; --info: #a9cdff; --danger: #ff8a7a;
+  --f: -apple-system, "Segoe UI", system-ui, Roboto, sans-serif;
+  --fd: "Exo 2", Bahnschrift, "Segoe UI", system-ui, sans-serif;
+  --raised: 9px 9px 20px var(--rd), -9px -9px 20px var(--rl);
+  --raised-sm: 3px 3px 7px var(--rd), -3px -3px 7px var(--rl);
+  --inset: inset 5px 5px 11px var(--rd), inset -5px -5px 11px var(--rl);
+  --inset-sm: inset 3px 3px 7px var(--rd), inset -3px -3px 7px var(--rl);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--base); color: var(--fg); font-family: var(--f); font-size: 16px; line-height: 1.35; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+button:focus-visible, label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+button:disabled { cursor: default; }
+.wrap { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding-top: env(safe-area-inset-top, 0px); }
+.nav { display: flex; align-items: center; gap: 10px; padding: 14px max(18px, env(safe-area-inset-right, 0px)) 12px max(18px, env(safe-area-inset-left, 0px)); }
+.nav img { width: 40px; height: 40px; border-radius: 12px; box-shadow: var(--raised-sm); }
+.nav .tt { flex: 1 1 auto; min-width: 0; }
+.nav h1 { font-family: var(--fd); font-style: italic; font-weight: 800; font-size: 24px; margin: 0; line-height: 1.05; }
+.nav p { margin: 3px 0 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.back { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--base); box-shadow: var(--raised-sm); color: var(--muted); flex: 0 0 auto; }
+.lang { display: flex; background: var(--well); box-shadow: var(--inset-sm); border-radius: 99px; padding: 3px; flex: 0 0 auto; }
+.lang button { font-size: 12px; font-weight: 700; padding: 5px 9px; border-radius: 99px; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: var(--accent); color: var(--ink); }
+.content { flex: 1 1 auto; padding: 4px max(18px, env(safe-area-inset-right, 0px)) 28px max(18px, env(safe-area-inset-left, 0px)); }
+.gt { font-family: var(--fd); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; opacity: .9; margin: 22px 8px 8px; }
+.gt:first-child { margin-top: 6px; }
+.card { background: var(--base); border-radius: 26px; box-shadow: var(--raised); padding: 6px 0; }
+.row { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 16px; position: relative; width: 100%; text-align: left; }
+.row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 16px; border-top: 1px solid rgba(255,255,255,.07); }
+.nm { flex: 1 1 auto; min-width: 0; font-size: 15.5px; }
+.nm small { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.amt { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 15px; }
+.amt.big { font-family: var(--fd); font-weight: 800; font-size: 18px; color: var(--accent); }
+.mut { color: var(--muted); }
+.lbl { font-family: var(--fd); font-weight: 700; }
+.foot { font-size: 13px; color: var(--muted); padding: 8px 10px 0; line-height: 1.45; margin: 0; }
+.pill { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+.pill.ok { background: rgba(127, 214, 164, .14); color: var(--ok); }
+.pill.you { background: rgba(251, 192, 45, .14); color: var(--accent); }
+.ini { width: 32px; height: 32px; border-radius: 50%; background: var(--well); box-shadow: var(--inset-sm); display: grid; place-items: center; font-size: 12px; font-weight: 700; color: var(--muted); flex: 0 0 auto; }
+.ini svg { width: 16px; height: 16px; }
+.tick { width: 30px; height: 30px; border-radius: 10px; background: var(--well); box-shadow: var(--inset-sm); display: grid; place-items: center; flex: 0 0 auto; color: transparent; }
+[aria-pressed="true"] > .tick { background: var(--accent); color: var(--ink); box-shadow: var(--raised-sm); }
+svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tick svg { width: 18px; height: 18px; stroke-width: 3; }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 30px; padding: 15px; font-family: var(--fd); font-weight: 700; font-size: 17px; }
+.btn svg { width: 20px; height: 20px; }
+.btn.solid { background: var(--accent); color: var(--ink); box-shadow: var(--raised-sm); }
+.btn.solid:disabled { background: var(--well); color: var(--faint); box-shadow: var(--inset-sm); }
+.btn.sec { background: var(--base); color: var(--fg); box-shadow: var(--raised-sm); font-size: 15px; padding: 12px; }
+.btn.link { font-family: var(--f); font-weight: 500; font-size: 14px; color: var(--muted); text-decoration: underline; padding: 8px; }
+.btns { display: grid; gap: 14px; margin-top: 20px; }
+.well { background: var(--well); box-shadow: var(--inset-sm); border-radius: 16px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+.well span { flex: 1 1 auto; min-width: 0; user-select: all; -webkit-user-select: all; overflow-wrap: anywhere; }
+.well button { font-size: 13.5px; font-weight: 700; color: var(--accent); flex: 0 0 auto; padding: 4px; }
+.sum { position: sticky; bottom: 0; margin: 0 -2px; padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, var(--base) 22%); }
+.sum > div { background: var(--base); box-shadow: var(--raised); border-radius: 26px; padding: 10px 10px 10px 18px; display: flex; align-items: center; gap: 10px; }
+.sum .tt { flex: 1 1 auto; font-size: 13px; color: var(--muted); }
+.sum .tt b { display: block; font-family: var(--fd); font-weight: 800; font-size: 21px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.sum .go { padding: 12px 20px; border-radius: 99px; background: var(--accent); color: var(--ink); font-family: var(--fd); font-weight: 700; font-size: 16px; box-shadow: var(--raised-sm); }
+.state { display: flex; gap: 12px; align-items: center; padding: 14px 16px; }
+.state .ic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--well); box-shadow: var(--inset-sm); color: var(--accent); flex: 0 0 auto; }
+.state .ic svg { width: 22px; height: 22px; stroke-width: 2.6; }
+.state b { display: block; font-family: var(--fd); font-size: 16px; }
+.state small { color: var(--muted); font-size: 13px; line-height: 1.4; display: block; margin-top: 2px; }
+.done { text-align: center; padding: 22px 6px 6px; }
+.done .ok { width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 14px; display: grid; place-items: center; background: var(--well); box-shadow: var(--inset); color: var(--accent); }
+.done .ok svg { width: 38px; height: 38px; stroke-width: 3; }
+.done h2 { font-family: var(--fd); font-style: italic; font-weight: 800; font-size: 24px; margin: 0 0 6px; }
+.done p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.center { text-align: center; padding: 60px 10px; color: var(--muted); }
+.center h2 { font-family: var(--fd); font-style: italic; font-size: 22px; color: var(--fg); margin: 0 0 8px; }
+.err { color: var(--danger); font-size: 14px; padding: 10px 10px 0; margin: 0; }
+.proof { display: flex; gap: 10px; align-items: center; justify-content: center; }
+.proof img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; }
+input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--well); border-top-color: var(--accent); margin: 0 auto 14px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="center"><div class="spin"></div>Memuat…</div></div>
+<script>
+const API = "https://bagi-rata-scan.liuskusuma.workers.dev/claim";
+const CODE = (new URLSearchParams(location.search).get("c") || location.hash.slice(1) || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+const NAME_KEY = "bagi-rata-claim-" + CODE;
+const STR = {
+  id: {
+    loading: "Memuat…", notFound: "Link tidak ditemukan", notFoundText: "Link ini sudah kedaluwarsa atau salah ketik. Minta link baru ke yang menagih.",
+    offline: "Tidak bisa terhubung", offlineText: "Cek koneksi internet, lalu coba lagi.", retry: "Coba lagi",
+    title: "Nota makanan", sub: p => `${p} yang menagih`, whoAreYou: "Kamu siapa?", noApp: "Tanpa aplikasi atau akun. Pilih nama untuk mulai.",
+    claimed: "Sudah", payerTag: "Penagih", tickTitle: "Kamu pesan apa?", tickSub: n => `Halo ${n}! Centang semua yang kamu pesan.`,
+    alsoBy: n => `Juga dipesan ${n}`, sharedGroup: p => `Sharing (diatur ${p})`, splitN: n => `Dibagi ${n} orang`, youIn: "kamu ikut", youOut: "kamu tidak ikut",
+    sharedNote: p => `${p} yang atur siapa ikut. Kalau ada yang kurang pas, bilang di grup ya.`, noItems: "Belum ada item di nota ini.",
+    yourTotal: "Total kamu, sudah service & pajak", review: "Cek", reviewTitle: "Bagianmu", yourItems: "Item kamu", nothing: "Kamu belum centang apa pun.",
+    subtotal: "Subtotal", service: "Service", tax: "Pajak 10%", total: "Total", shared: "Sharing",
+    calcNote: "Service dan pajak dihitung dari subtotal kamu, sama seperti nota.", payTo: "Transfer ke", copy: "Salin", copied: "Tersalin",
+    send: "Kirim klaim", sending: "Mengirim…", sendFail: "Gagal mengirim. Cek koneksi lalu coba lagi.",
+    doneT: "Klaim terkirim", doneS: p => `${p} sudah bisa melihat item kamu.`, change: "Ubah item", notMe: "Bukan kamu? Ganti nama",
+    later: p => `Nanti saat ${p} kirim tagihan akhir, buka link ini lagi untuk bayar.`, seeBill: "Lihat tagihan & bayar",
+    closedT: "Klaim sudah ditutup", closedS: p => `${p} sudah mengirim tagihan akhir, jadi item tidak bisa diubah lagi.`,
+    billTitle: "Tagihan kamu", finalFrom: p => `Tagihan akhir dari ${p}`, foodPart: "Termasuk makanan", roundNote: "Sama dengan angka di pesan WhatsApp.",
+    attach: "Lampirkan screenshot transfer", attached: "Screenshot terlampir · ganti", iPaid: "Saya sudah transfer",
+    waitT: p => `Menunggu ${p} cek`, waitS: p => `${p} menandai lunas setelah uangnya masuk ke rekening.`,
+    paidT: "Lunas", paidS: p => `Transfermu sudah diterima ${p}. Makasih!`, payFail: "Gagal mengirim. Cek koneksi lalu coba lagi.", tooBig: "Gambar terlalu besar. Coba screenshot lain.",
+    noShare: "Kamu tidak ada di tagihan ini. Coba cek namanya lagi.", myClaim: "Klaimku", fresh: "Belum klaim"
+  },
+  en: {
+    loading: "Loading…", notFound: "Link not found", notFoundText: "This link has expired or has a typo. Ask whoever is collecting for a new one.",
+    offline: "Can't connect", offlineText: "Check your internet connection and try again.", retry: "Try again",
+    title: "Food bill", sub: p => `${p} is collecting`, whoAreYou: "Who are you?", noApp: "No app or account needed. Pick your name to start.",
+    claimed: "Done", payerTag: "Collecting", tickTitle: "What did you order?", tickSub: n => `Hi ${n}! Tick everything you ordered.`,
+    alsoBy: n => `Also ordered by ${n}`, sharedGroup: p => `Shared plates (set by ${p})`, splitN: n => `Split ${n} ways`, youIn: "you're in", youOut: "you're not in",
+    sharedNote: p => `${p} decides who shares these. If something looks wrong, say so in the group.`, noItems: "This bill has no items yet.",
+    yourTotal: "Your total, incl. service & tax", review: "Review", reviewTitle: "Your share", yourItems: "Your items", nothing: "You haven't ticked anything.",
+    subtotal: "Subtotal", service: "Service", tax: "Tax 10%", total: "Total", shared: "Shared",
+    calcNote: "Service and tax are worked out on your subtotal, same as the bill.", payTo: "Pay to", copy: "Copy", copied: "Copied",
+    send: "Send my claim", sending: "Sending…", sendFail: "Couldn't send. Check your connection and try again.",
+    doneT: "Claim sent", doneS: p => `${p} can see your items now.`, change: "Change my items", notMe: "Not you? Change name",
+    later: p => `When ${p} sends the final bill, open this link again to pay.`, seeBill: "See the bill and pay",
+    closedT: "Claims are closed", closedS: p => `${p} has sent the final bill, so items can't be changed anymore.`,
+    billTitle: "Your bill", finalFrom: p => `Final bill from ${p}`, foodPart: "Includes food", roundNote: "Same as the amount in the WhatsApp message.",
+    attach: "Attach transfer screenshot", attached: "Screenshot attached · change", iPaid: "I've transferred",
+    waitT: p => `Waiting for ${p} to check`, waitS: p => `${p} marks it paid once the money shows up in the account.`,
+    paidT: "Paid", paidS: p => `${p} received your transfer. Thanks!`, payFail: "Couldn't send. Check your connection and try again.", tooBig: "That image is too large. Try another screenshot.",
+    noShare: "You're not on this bill. Check the name again.", myClaim: "My claim", fresh: "Not claimed"
+  }
+};
+const IC = {
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg>',
+  back: '<svg viewBox="0 0 24 24" width="20" height="20" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg>',
+  people: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 6 5"/></svg>',
+  clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  send: '<svg viewBox="0 0 24 24"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg>',
+  clip: '<svg viewBox="0 0 24 24"><path d="M20 11l-8.5 8.5a5 5 0 0 1-7-7L13 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L14 7"/></svg>',
+  edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>'
+};
+const st = { d: null, err: null, view: "loading", name: null, draft: new Set(), lang: null, busy: false, msg: "", proof: null, copied: false };
+try { st.name = localStorage.getItem(NAME_KEY); st.lang = localStorage.getItem("bagi-rata-claim-lang"); } catch (e) {}
+
+const T = () => STR[st.lang] || STR.id;
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rp = n => "Rp " + Math.round(n).toLocaleString("id-ID");
+const ini = n => esc(String(n).trim().slice(0, 2).toUpperCase());
+const D = () => st.d.data;
+const payer = () => D().payer || (st.lang === "en" ? "The payer" : "Penagih");
+const items = () => (D().items || []).filter(it => it.name || it.price);
+const rate = () => 1 + (+D().svc || 0) / 100 + (D().tax ? .1 : 0);
+const claimOf = n => st.d.claims[n] ? new Set(st.d.claims[n].items) : null;
+function subOf(ids, n) {
+  let s = 0;
+  for (const it of items()) {
+    if (it.shared) { if ((it.who || []).includes(n)) s += (+it.price || 0) / it.who.length; }
+    else if (ids.has(it.id)) s += +it.price || 0;
+  }
+  return s;
+}
+
+async function load(quiet) {
+  if (!CODE) { st.err = "nf"; st.view = "err"; return render(); }
+  try {
+    const r = await fetch(`${API}/${CODE}`, { cache: "no-store" });
+    if (r.status === 404) { st.err = "nf"; st.view = "err"; return render(); }
+    if (!r.ok) throw new Error(r.status);
+    st.d = await r.json(); st.err = null;
+    if (!st.lang) st.lang = D().lang === "en" ? "en" : "id";
+    if (st.name && !(D().people || []).includes(st.name)) st.name = null;
+    if (!quiet || st.view === "loading" || st.view === "err") route();
+  } catch (e) {
+    if (quiet && st.d) return;
+    st.err = "off"; st.view = "err";
+  }
+  render();
+}
+function route() {
+  if (!st.name) return st.view = "pick";
+  const c = claimOf(st.name);
+  st.draft = new Set(c || []);
+  if (st.d.finals && st.d.finals[st.name] != null) st.view = "pay";
+  else if (c) st.view = "done";
+  else st.view = st.d.closed ? "done" : "tick";
+}
+
+function nav(title, sub, back) {
+  const t = T();
+  return `<div class="nav">${back ? `<button class="back" type="button" data-go="${back}" aria-label="Back">${IC.back}</button>` : `<img src="icons/icon-192.png" alt="">`}
+    <div class="tt"><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>
+    <div class="lang" role="group" aria-label="Language">${["id", "en"].map(l => `<button type="button" data-lang="${l}" aria-pressed="${st.lang === l}">${l.toUpperCase()}</button>`).join("")}</div></div>`;
+}
+function bank() {
+  const t = T();
+  if (!D().bank) return "";
+  return `<div class="gt">${t.payTo}</div><div class="well"><span>${esc(D().bank)}</span><button type="button" id="copy-bank">${st.copied ? t.copied : t.copy}</button></div>`;
+}
+
+function render() {
+  const app = document.getElementById("app");
+  const t = T();
+  document.documentElement.lang = st.lang || "id";
+  if (st.view === "loading") return;
+  if (st.view === "err") {
+    const nf = st.err === "nf";
+    app.innerHTML = `<div class="center"><h2>${nf ? t.notFound : t.offline}</h2><p>${nf ? t.notFoundText : t.offlineText}</p>${nf ? "" : `<div class="btns"><button class="btn sec" type="button" id="retry">${t.retry}</button></div>`}</div>`;
+    return;
+  }
+  const d = st.d, me = st.name, where = D().title ? `${D().title}` : t.title;
+  const sub = [D().venue, D().dateLine].filter(Boolean).join(" · ") || t.sub(payer());
+  let html = "";
+
+  if (st.view === "pick") {
+    html = nav(where, sub) + `<div class="content"><div class="gt">${t.whoAreYou}</div><div class="card">${(D().people || []).map(n => {
+      const isPayer = D().payerName && n === D().payerName, done = !!d.claims[n];
+      return `<button type="button" class="row" ${isPayer ? "disabled" : `data-pick="${esc(n)}"`} style="${isPayer ? "opacity:.55" : ""}"><span class="ini">${ini(n)}</span><span class="nm">${esc(n)}</span>${isPayer ? `<span class="pill you">${t.payerTag}</span>` : done ? `<span class="pill ok">✓ ${t.claimed}</span>` : `<span class="mut">›</span>`}</button>`;
+    }).join("")}</div><p class="foot">${t.noApp}</p></div>`;
+  }
+
+  else if (st.view === "tick") {
+    const own = items().filter(it => !it.shared), sh = items().filter(it => it.shared);
+    const total = subOf(st.draft, me) * rate();
+    html = nav(t.tickTitle, t.tickSub(me), "pick") + `<div class="content">
+      ${d.closed ? `<div class="card" style="margin-bottom:14px"><div class="state"><span class="ic">${IC.clock}</span><span><b>${t.closedT}</b><small>${t.closedS(esc(payer()))}</small></span></div></div>` : ""}
+      ${own.length ? `<div class="card">${own.map(it => {
+        const on = st.draft.has(it.id);
+        const others = Object.entries(d.claims).filter(([n, c]) => n !== me && c.items.includes(it.id)).map(([n]) => n);
+        return `<button type="button" class="row" data-tick="${esc(it.id)}" aria-pressed="${on}" ${d.closed ? "disabled" : ""}><span class="tick">${IC.check}</span><span class="nm">${esc(it.name)}${others.length ? `<small>${esc(t.alsoBy(others.join(", ")))}</small>` : ""}</span><span class="amt ${on ? "" : "mut"}">${rp(it.price)}</span></button>`;
+      }).join("")}</div>` : `<p class="foot">${t.noItems}</p>`}
+      ${sh.length ? `<div class="gt">${esc(t.sharedGroup(payer()))}</div><div class="card">${sh.map(it => {
+        const who = it.who || [], inn = who.includes(me);
+        return `<div class="row"><span class="ini" aria-hidden="true">${IC.people}</span><span class="nm">${esc(it.name)}<small>${t.splitN(who.length)} · ${inn ? t.youIn : t.youOut}</small></span><span class="amt ${inn ? "" : "mut"}">${inn ? rp(it.price / who.length) : "–"}</span></div>`;
+      }).join("")}</div><p class="foot">${esc(t.sharedNote(payer()))}</p>` : ""}
+      <div class="sum"><div><span class="tt">${t.yourTotal}<b>${rp(total)}</b></span><button class="go" type="button" data-go="review">${t.review}</button></div></div></div>`;
+  }
+
+  else if (st.view === "review") {
+    const s = subOf(st.draft, me), svc = s * (+D().svc || 0) / 100, tax = D().tax ? s * .1 : 0;
+    const rows = items().filter(it => it.shared ? (it.who || []).includes(me) : st.draft.has(it.id)).map(it => {
+      const n = it.shared ? it.who.length : 1;
+      return `<div class="row"><span class="nm">${esc(it.name)}${it.shared ? `<small>${t.shared} · 1/${n} × ${rp(it.price)}</small>` : ""}</span><span class="amt">${rp(it.price / n)}</span></div>`;
+    }).join("");
+    html = nav(t.reviewTitle, `${me} · ${where}`, "tick") + `<div class="content">
+      <div class="gt">${t.yourItems}</div>
+      <div class="card">${rows || `<div class="row"><span class="nm mut">${t.nothing}</span></div>`}
+        <div class="row"><span class="nm lbl">${t.subtotal}</span><span class="amt">${rp(s)}</span></div>
+        ${svc ? `<div class="row"><span class="nm">${t.service} ${+D().svc}%</span><span class="amt mut">${rp(svc)}</span></div>` : ""}
+        ${tax ? `<div class="row"><span class="nm">${t.tax}</span><span class="amt mut">${rp(tax)}</span></div>` : ""}
+        <div class="row"><span class="nm lbl">${t.total}</span><span class="amt big">${rp(s + svc + tax)}</span></div></div>
+      <p class="foot">${t.calcNote}</p>
+      ${bank()}
+      ${st.msg ? `<p class="err" role="alert">${st.msg}</p>` : ""}
+      <div class="btns"><button class="btn solid" type="button" id="send" ${st.busy || d.closed ? "disabled" : ""}>${IC.check}${st.busy ? t.sending : t.send}</button></div></div>`;
+  }
+
+  else if (st.view === "done") {
+    const c = claimOf(me);
+    const tot = c ? subOf(c, me) * rate() : 0;
+    html = nav(where, sub) + `<div class="content">
+      ${c ? `<div class="done"><div class="ok">${IC.check}</div><h2>${t.doneT}</h2><p>${esc(t.doneS(payer()))}</p></div>
+      <div class="card" style="margin-top:22px"><div class="row"><span class="nm lbl">${esc(me)}</span><span class="amt big">${rp(tot)}</span></div></div>`
+      : `<div class="card"><div class="state"><span class="ic">${IC.clock}</span><span><b>${t.closedT}</b><small>${t.closedS(esc(payer()))}</small></span></div></div>`}
+      ${d.finals && d.finals[me] != null ? "" : `<p class="foot">${esc(t.later(payer()))}</p>`}
+      <div class="btns">
+        ${d.finals && d.finals[me] != null ? `<button class="btn solid" type="button" data-go="pay">${t.seeBill}</button>` : ""}
+        ${d.closed ? "" : `<button class="btn sec" type="button" data-go="tick">${IC.edit}${t.change}</button>`}
+        <button class="btn link" type="button" data-go="pick">${t.notMe}</button></div></div>`;
+  }
+
+  else if (st.view === "pay") {
+    const amount = d.finals[me], p = d.pays[me], status = p && p.status;
+    const c = claimOf(me), food = c || items().some(it => it.shared && (it.who || []).includes(me)) ? subOf(c || new Set(), me) * rate() : 0;
+    const state = status === "paid"
+      ? `<div class="card"><div class="state"><span class="ic">${IC.check}</span><span><b>${t.paidT}</b><small>${esc(t.paidS(payer()))}</small></span></div></div>`
+      : status === "sent" ? `<div class="card"><div class="state"><span class="ic">${IC.clock}</span><span><b>${esc(t.waitT(payer()))}</b><small>${esc(t.waitS(payer()))}</small></span></div></div>` : "";
+    html = nav(t.billTitle, `${me} · ${where}`, d.finals ? "" : "done") + `<div class="content">${state}
+      <div class="gt">${esc(t.finalFrom(payer()))}</div>
+      <div class="card">${food ? `<div class="row"><span class="nm">${t.foodPart}</span><span class="amt mut">${rp(food)}</span></div>` : ""}
+        <div class="row"><span class="nm lbl">${t.total}</span><span class="amt big">${rp(amount)}</span></div></div>
+      <p class="foot">${t.roundNote}</p>
+      ${bank()}
+      ${st.msg ? `<p class="err" role="alert">${st.msg}</p>` : ""}
+      ${status ? "" : `<div class="btns">
+        <label class="btn sec" style="cursor:pointer"><input type="file" accept="image/*" id="proof">${st.proof ? `<span class="proof"><img src="${st.proof}" alt=""> ${t.attached}</span>` : `${IC.clip}${t.attach}`}</label>
+        <button class="btn solid" type="button" id="paid" ${st.busy ? "disabled" : ""}>${IC.send}${st.busy ? t.sending : t.iPaid}</button></div>`}
+      <div class="btns"><button class="btn link" type="button" data-go="pick">${t.notMe}</button></div></div>`;
+  }
+  app.innerHTML = html;
+}
+
+// Screenshots are shrunk on the phone before upload so they stay small.
+async function shrink(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, no) => { const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url; });
+    const k = Math.min(1, 1280 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    for (const q of [.72, .55, .4]) { const out = c.toDataURL("image/jpeg", q); if (out.length < 650000) return out; }
+    return null;
+  } finally { URL.revokeObjectURL(url); }
+}
+async function post(path, body) {
+  const r = await fetch(`${API}/${CODE}/${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+  return r.json();
+}
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b || b.disabled) return;
+  const t = T();
+  st.msg = "";
+  if (b.id === "retry") { st.view = "loading"; return load(); }
+  if (b.dataset.lang) { st.lang = b.dataset.lang; try { localStorage.setItem("bagi-rata-claim-lang", st.lang); } catch (err) {} }
+  else if (b.dataset.pick !== undefined) {
+    st.name = b.dataset.pick; try { localStorage.setItem(NAME_KEY, st.name); } catch (err) {}
+    route(); if (st.view === "done" && !st.d.closed && !(st.d.finals && st.d.finals[st.name] != null)) st.view = "tick";
+  }
+  else if (b.dataset.go) {
+    if (b.dataset.go === "pick") { st.name = null; try { localStorage.removeItem(NAME_KEY); } catch (err) {} }
+    if (b.dataset.go === "tick" && st.view !== "review") st.draft = new Set(claimOf(st.name) || []);
+    st.view = b.dataset.go; window.scrollTo(0, 0);
+  }
+  else if (b.dataset.tick) { const id = b.dataset.tick; st.draft.has(id) ? st.draft.delete(id) : st.draft.add(id); }
+  else if (b.id === "copy-bank") {
+    const text = D().bank;
+    const sel = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+    try { await navigator.clipboard.writeText(text); st.copied = true; setTimeout(() => { st.copied = false; render(); }, 1500); } catch (err) { sel(); return; }
+  }
+  else if (b.id === "send") {
+    st.busy = true; render();
+    try { await post("claim", { name: st.name, items: [...st.draft] }); await load(true); st.view = "done"; }
+    catch (err) { st.msg = err.message === "closed" ? t.closedT : t.sendFail; if (err.message === "closed") await load(true); }
+    st.busy = false;
+  }
+  else if (b.id === "paid") {
+    st.busy = true; render();
+    try { await post("pay", { name: st.name, proof: st.proof || undefined }); await load(true); }
+    catch (err) { st.msg = err.message === "proof_too_big" ? t.tooBig : t.payFail; }
+    st.busy = false;
+  }
+  else return;
+  render();
+});
+document.addEventListener("change", async e => {
+  if (e.target.id !== "proof" || !e.target.files[0]) return;
+  try { st.proof = await shrink(e.target.files[0]); st.msg = st.proof ? "" : T().tooBig; } catch (err) { st.msg = T().tooBig; }
+  render();
+});
+// While someone waits for the payer to confirm, check again now and then (and whenever they come back to the page).
+setInterval(() => { if (document.visibilityState === "visible" && (st.view === "pay" || st.view === "pick")) load(true); }, 20000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && st.d) load(true); });
+load();
+</script>
+</body>
+</html>

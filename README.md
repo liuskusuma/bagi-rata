@@ -6,6 +6,7 @@ Folder ini berisi aplikasi Bagi Rata versi web yang bisa dipasang di iPhone lewa
 |---|---|
 | `index.html` | Aplikasinya (semua tampilan dan hitungan) |
 | `manifest.webmanifest` | Nama, warna, dan icon saat dipasang di layar utama |
+| `k.html` | Halaman klaim untuk teman yang membuka link |
 | `sw.js` | Supaya aplikasi tetap terbuka walau tanpa internet |
 | `icons/` | Icon BR untuk layar utama iPhone dan Android |
 
@@ -21,6 +22,12 @@ Data tiap orang (pemain, biaya, tema, bahasa) tersimpan di HP masing-masing.
 ## Tenis dan Split Bill
 
 Saat aplikasi dibuka, pengguna memilih **Tenis** (lapangan, jam main, ballboy, bola, makanan) atau **Split Bill** (hanya orang, item nota, service/pajak, dan biaya lain yang dibagi rata). Isian kedua jenis disimpan terpisah. "Ingat pilihan saya" melewati layar pilihan; jenis tagihan bisa diganti lewat tombol di header atau di Setelan.
+
+## Klaim lewat link
+
+Di halaman Makanan ada **Klaim lewat link**. Penagih membuat link dan mengirimnya ke grup WhatsApp. Teman membuka `k.html` (tanpa install), memilih nama, dan mencentang item "Per orang" yang dia pesan. Item "Dibagi" tetap diatur penagih. Klaim yang masuk otomatis mencentang nama di aplikasi penagih. Setelah tagihan dikirim ke WhatsApp, klaim ditutup dan teman bisa mengetuk "Saya sudah transfer" (boleh dengan screenshot). Penagih melihat statusnya di halaman Tagihan dan mengetuk Diterima.
+
+Data link disimpan di Cloudflare Worker `worker/` dengan database D1 (lihat `worker/README.md`).
 
 ## Hosting
 

@@ -6,3 +6,9 @@ compatibility_date = "2026-10-01"
 # [[kv_namespaces]]
 # binding = "LIMITS"
 # id = "<kv namespace id>"
+
+# Claim links: create a D1 database and uncomment.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "bagi-rata"
+# database_id = "<d1 database id>"

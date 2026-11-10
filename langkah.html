@@ -147,6 +147,15 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; bo
 .pill { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
 .pill.ok { background: var(--chalk); color: #1d2a1f; }
 .pill.warn { background: #ffe2c4; color: #7a3500; }
+.pill.sent { background: #d6e6ff; color: #12346b; }
+.cl-intro { font-size: 14px; line-height: 1.4; color: var(--muted); padding: 4px 0; }
+.cl-link { font-family: var(--f-num); font-size: 12.5px; color: var(--muted); flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.addrow { display: block; text-decoration: none; }
+.addrow:disabled { opacity: .5; cursor: default; }
+.pay-amt { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.pay-acts { padding-top: 0; }
+.pay-acts::before { display: none; }
+.proof-img { display: block; width: 100%; max-height: 60vh; object-fit: contain; border-radius: 12px; background: #000; margin: 6px 0 4px; }
 .person { width: 100%; text-align: left; }
 .person .name { flex: 1 1 auto; }
 .person .amt { font-family: var(--f-display); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 18px; }
@@ -368,6 +377,22 @@ const STR = {
     foodOn: "Ada pembagian makanan", food: "Makanan", foodName: "Nama makanan", price: "Harga", each: "Per orang", shared: "Dibagi", addFood: "+ Tambah makanan",
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
+    clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" tetap kamu yang atur di bawah.",
+    clCreate: "Buat link klaim", clCreating: "Membuat link…", clNeed: "Isi nama orang dan item makanan dulu.",
+    clFail: "Gagal terhubung ke server. Cek internet lalu coba lagi.", clNoDb: "Link klaim belum disiapkan di server (database D1 belum dipasang).",
+    clShare: "Kirim link ke grup WhatsApp", clCopy: "Salin", clCopied: "Link tersalin",
+    clMsg: (u, t) => `🍽️ ${t || "Nota makanan"}\n\nKlik link, pilih nama, centang yang kamu pesan ya. Yang sharing sudah aku atur.\n${u}`,
+    clStatus: (a, b) => `${a}/${b} sudah klaim`, clRefresh: "Perbarui sekarang", clDone: "Sudah", clWait: "Belum klaim", clItems: n => `${n} item`,
+    clNoOwner: "Belum ada pemilik", clAllOwned: "Tidak ada, semua sudah ada pemiliknya",
+    clRemind: "Ingatkan yang belum klaim", clRemindMsg: (n, u) => `Halo ${n}, jangan lupa klaim makananmu ya 🙏\n${u}`,
+    clNote: "Klaim yang masuk otomatis mencentang nama di item \"Per orang\" (dicek tiap 15 detik). Kamu tetap bisa ubah sendiri. Item tanpa pemilik bisa kamu centangkan atau jadikan \"Dibagi\".",
+    clClosed: "Klaim sudah ditutup karena tagihan sudah dikirim.", clStop: "Hapus link klaim", clStopConfirm: "Hapus link klaim dari tagihan ini? Link lama tidak bisa dipakai lagi.",
+    payTitle: "Pembayaran", payOf: (a, b) => `${a}/${b} lunas`, payIn: "Sudah masuk", paySent: "Katanya sudah transfer", payPaid: "Lunas", payNone: "Belum bayar",
+    payRecv: "Diterima", payCash: "Tandai lunas (tunai)", payUndo: "Batal", payProof: "Lihat bukti",
+    payNote: "Aplikasi tidak bisa melihat rekeningmu. \"Katanya sudah transfer\" artinya teman sudah mengetuk tombolnya, jadi cek rekening dulu sebelum mengetuk Diterima.",
+    payStart: "Setelah tagihan ini kamu kirim ke WhatsApp, teman bisa bayar dan kabari lewat link klaim, dan statusnya muncul di sini. Klaim makanan ikut ditutup.",
+    payRemind: "Ingatkan yang belum bayar", payRemindMsg: (n, u) => `Halo ${n}, tagihannya sudah aku kirim ya. Kalau sudah transfer, kabari lewat link ini 🙏\n${u}`,
+    proofTitle: n => `Bukti transfer ${n}`, proofNone: "Bukti transfer tidak ditemukan.", close: "Tutup", loadingDots: "Memuat…",
     tapName: "Ketuk nama untuk melihat cara hitungnya.", waMsg: "Pesan WhatsApp", send: "Kirim ke WhatsApp", copy: "Salin pesan", copied: "Pesan tersalin", selectFallback: "Teks terpilih, salin manual",
     perHourShort: "jam", ppl: "org", people: "orang", total: "Total", rounded: { "0": "tidak dibulatkan", "1000": "dibulatkan ke atas", "down1000": "dibulatkan ke bawah" },
     billing: n => `Ditagih ${n} orang`, language: "Bahasa", theme: "Tema", themeNote: "Pilih warna polos, atau lapangan Grand Slam dengan tekstur. Peach dan Sky adalah tema terang.",
@@ -403,6 +428,22 @@ const STR = {
     foodOn: "Split food", food: "Food", foodName: "Food name", price: "Price", each: "Each", shared: "Shared", addFood: "+ Add food",
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
+    clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. \"Shared\" items stay yours to set below.",
+    clCreate: "Create claim link", clCreating: "Creating link…", clNeed: "Add people and food items first.",
+    clFail: "Couldn't reach the server. Check your connection and try again.", clNoDb: "Claim links aren't set up on the server yet (the D1 database isn't connected).",
+    clShare: "Send the link to the WhatsApp group", clCopy: "Copy", clCopied: "Link copied",
+    clMsg: (u, t) => `🍽️ ${t || "Food bill"}\n\nTap the link, pick your name and tick what you ordered. I've already sorted the shared plates.\n${u}`,
+    clStatus: (a, b) => `${a}/${b} claimed`, clRefresh: "Refresh now", clDone: "Done", clWait: "Not claimed", clItems: n => n === 1 ? "1 item" : `${n} items`,
+    clNoOwner: "No owner yet", clAllOwned: "None, every item has an owner",
+    clRemind: "Remind those who haven't claimed", clRemindMsg: (n, u) => `Hi ${n}, don't forget to claim your food 🙏\n${u}`,
+    clNote: "Claims tick names on \"Each\" items automatically (checked every 15 seconds). You can still change them yourself. Tick someone on items with no owner, or make them \"Shared\".",
+    clClosed: "Claims are closed because the bill has been sent.", clStop: "Remove claim link", clStopConfirm: "Remove the claim link from this bill? The old link will stop working.",
+    payTitle: "Payments", payOf: (a, b) => `${a}/${b} paid`, payIn: "Received", paySent: "Says transferred", payPaid: "Paid", payNone: "Not paid",
+    payRecv: "Received", payCash: "Mark paid (cash)", payUndo: "Undo", payProof: "See proof",
+    payNote: "The app can't see your bank account. \"Says transferred\" only means your friend tapped the button, so check your bank before you tap Received.",
+    payStart: "Once you send this bill to WhatsApp, friends can pay and tell you through the claim link, and their status shows here. Food claims close at the same time.",
+    payRemind: "Remind those who haven't paid", payRemindMsg: (n, u) => `Hi ${n}, I've sent the bill. When you've transferred, let me know through this link 🙏\n${u}`,
+    proofTitle: n => `Transfer proof from ${n}`, proofNone: "No transfer proof found.", close: "Close", loadingDots: "Loading…",
     tapName: "Tap a name to see how it was calculated.", waMsg: "WhatsApp message", send: "Send to WhatsApp", copy: "Copy message", copied: "Message copied", selectFallback: "Text selected, copy it manually",
     perHourShort: "h", ppl: "ppl", people: "people", total: "Total", rounded: { "0": "not rounded", "1000": "rounded up", "down1000": "rounded down" },
     billing: n => `Billing ${n} people`, language: "Language", theme: "Theme", themeNote: "Pick a plain color, or a Grand Slam court with its texture. Peach and Sky are light themes.",
@@ -872,7 +913,7 @@ function viewMakanan(T) {
     ${S.players.length ? "" : `<p class="foot" style="margin-bottom:12px">${T.needPlayers}</p>`}
     ${isSplit() ? "" : `<div class="group" style="margin-top:6px"><div class="row"><span class="lbl ask">${T.foodAsk}</span>
       <button type="button" class="switch" role="switch" id="food-switch" aria-checked="${!!S.foodOn}" aria-label="${T.foodAsk}"></button></div></div>`}
-    ${S.foodOn ? `<button type="button" class="btn btn-scan" id="scan-bill"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>${T.scan}</button>` + S.foodItems.map(f => `
+    ${S.foodOn ? `<button type="button" class="btn btn-scan" id="scan-bill"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>${T.scan}</button>` + viewClaim(T) + S.foodItems.map(f => `
       <div class="group-title"><span>${esc(f.name || T.food)}</span><button type="button" class="danger" data-del-food="${f.id}" aria-label="${T.del} ${esc(f.name || T.food)}">${TRASH}</button></div>
       <div class="group">
         <div class="row"><label>${T.name}</label><input aria-label="${T.foodName}" data-col="foodItems" data-id="${f.id}" data-k="name" value="${esc(f.name)}" placeholder="${T.foodName}"></div>
@@ -942,9 +983,9 @@ function viewTagihan(T) {
     <div class="group-title">${T.waMsg}</div>
     <pre class="bubble">${esc(msg)}</pre>
     <div class="btns">
-      <a class="btn btn-wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${T.send}</a>
+      <a class="btn btn-wa" id="send-wa" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${T.send}</a>
       <button type="button" class="btn btn-copy" id="copy">${T.copy}</button>
-    </div>`;
+    </div>${viewPays(T, res)}`;
 }
 
 const KIND_ICON = {
@@ -1064,6 +1105,7 @@ function renderSummary() {
   $("summary").hidden = tab === "kind" || (guided() ? !["players", "cost", "food"].includes(tab) || !S.players.length : tab === "bill" || tab === "setelan");
   $("summary").innerHTML = `<span>${L().billing(res.rows.length - (PID() ? 1 : 0))}</span><b>${rp(res.collected)} ›</b>`;
   save();
+  if (S.claim && ["food", "bill"].includes(tab) && Date.now() - (claimSync.at || 0) > 8000) setTimeout(() => claimSync(true), 0);
 }
 function toast(t) { const el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1600); }
 
@@ -1115,6 +1157,7 @@ $("content").addEventListener("input", e => {
 $("content").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const d = b.dataset, T = L();
+  if (claimClick(b, T)) return;
   if (d.offer) { setMode(d.offer); delete P.offerGuided; back = firstTab(); }
   else if (d.kind) { delete P.offerGuided; const same = P.kind === d.kind && back !== "kind"; setKind(d.kind); tab = same ? back : back = firstTab(); }
   else if (b.id === "kind-remember") P.rememberKind = !P.rememberKind;
@@ -1146,6 +1189,7 @@ $("content").addEventListener("click", e => {
     const text = buildMessage(compute());
     const fallback = () => { const r = document.createRange(); r.selectNodeContents($("content").querySelector(".bubble")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(T.selectFallback); };
     try { navigator.clipboard.writeText(text).then(() => toast(L().copied), fallback); } catch (err) { fallback(); }
+    claimSent();
     return;
   } else return;
   render(true);
@@ -1192,6 +1236,170 @@ $("content").addEventListener("keydown", e => {
   e.preventDefault();
   if (e.target.dataset.col === "players") $("add-player")?.click(); else e.target.blur();
 });
+
+// ---------- Claim by link: friends tick their own items on k.html; this app stays in charge of the bill ----------
+// The bill lives on Lius's Cloudflare Worker (D1). Claims tick names on "Each" items; "Shared" items stay as set here.
+// After the bill is sent, friends say on the same page when they have transferred, and the payer confirms here.
+let CL = null, clBusy = false, clErr = "";
+const claimApi = () => AI_URL + "claim";
+const claimUrl = () => new URL(`k.html?c=${S.claim.code}`, location.href).href;
+const clName = p => ((p && p.name) || "").trim();
+function claimData() {
+  const name = id => clName(S.players.find(p => p.id === id)), pid = PID();
+  return {
+    v: 1, lang: P.lang, kind: P.kind || "tennis", title: (S.title || "").trim(), venue: (S.venue || "").trim(), dateLine: dateLine(S.date),
+    payer: (S.bankHolder || "").trim() || (pid ? name(pid) : ""), payerName: pid ? name(pid) : "",
+    bank: bankLine(), svc: svcPct(), tax: !!S.foodTax,
+    people: [...new Set(S.players.map(clName).filter(Boolean))],
+    items: S.foodItems.filter(f => f.name || +f.price).map(f => ({ id: f.id, name: f.name || "", price: +f.price || 0, shared: f.mode === "split", who: f.mode === "split" ? f.who.map(name).filter(Boolean) : [] }))
+  };
+}
+const claimFinals = () => Object.fromEntries(compute().rows.filter(r => clName(r.p) && r.p.id !== PID()).map(r => [clName(r.p), r.final]));
+async function clFetch(path, opt = {}, admin = S.claim && S.claim.admin) {
+  const r = await fetch(claimApi() + path, { cache: "no-store", ...opt, headers: { "Content-Type": "application/json", ...(admin ? { "X-Admin": admin } : {}) } });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.status);
+  return j;
+}
+const clMsgErr = e => e.message === "no_db" ? L().clNoDb : L().clFail;
+async function claimCreate() {
+  clBusy = true; clErr = ""; render(true);
+  try {
+    const data = claimData(), j = await clFetch("", { method: "POST", body: JSON.stringify({ data }) }, null);
+    S.claim = { code: j.code, admin: j.admin, pushed: JSON.stringify(data), applied: {} };
+    CL = { claims: {}, pays: {}, closed: false, finals: null };
+  } catch (e) { clErr = clMsgErr(e); }
+  clBusy = false; render(true);
+}
+// Sends any change to items, names or amounts, then reads claims and payments back.
+async function claimSync(quiet) {
+  if (!S.claim || claimSync.running) return;
+  claimSync.running = true; claimSync.at = Date.now();
+  const c = S.claim;
+  try {
+    const data = claimData(), h = JSON.stringify(data), body = {};
+    if (h !== c.pushed) body.data = data;
+    if (c.sent) { const f = claimFinals(), fh = JSON.stringify(f); if (fh !== c.finalsPushed) { body.finals = f; body.closed = true; } }
+    if (Object.keys(body).length) {
+      await clFetch("/" + c.code, { method: "PUT", body: JSON.stringify(body) });
+      if (body.data) c.pushed = h;
+      if (body.finals) c.finalsPushed = JSON.stringify(body.finals);
+    }
+    CL = await clFetch("/" + c.code);
+    clErr = "";
+    applyClaims();
+  } catch (e) {
+    if (e.message === "not_found" && S.claim === c) { S.claim = null; CL = null; }
+    clErr = clMsgErr(e);
+  }
+  claimSync.running = false;
+  save();
+  const a = document.activeElement, typing = a && a.closest && a.closest("#content") && /INPUT|SELECT|TEXTAREA/.test(a.tagName);
+  if (!(quiet && typing) && ["food", "bill"].includes(tab)) render(true);
+}
+// A new or changed claim sets that person's ticks on "Each" items; edits made here after it stay until they claim again.
+function applyClaims() {
+  if (!CL || !S.claim) return;
+  const ap = S.claim.applied || (S.claim.applied = {});
+  for (const [name, c] of Object.entries(CL.claims || {})) {
+    if (ap[name] >= c.updated) continue;
+    const p = S.players.find(x => clName(x).toLowerCase() === name.toLowerCase()); if (!p) continue;
+    for (const f of S.foodItems) if (f.mode !== "split") {
+      const want = c.items.includes(f.id), has = f.who.includes(p.id);
+      if (want && !has) f.who = f.who.concat(p.id); else if (!want && has) f.who = f.who.filter(x => x !== p.id);
+    }
+    ap[name] = c.updated;
+  }
+}
+// Sending (or copying) the bill message closes claims and opens payments on the friends' page.
+function claimSent() { if (!S.claim || S.claim.sent) return; S.claim.sent = true; save(); claimSync(true); }
+function viewClaim(T) {
+  const named = S.players.filter(clName), items = S.foodItems.filter(f => f.name || +f.price);
+  if (!S.claim) {
+    const off = clBusy || !named.length || !items.length;
+    return `<div class="group-title"><span>${T.clTitle}</span></div>
+      <div class="group"><div class="row"><span class="cl-intro">${esc(T.clIntro)}</span></div>
+        <div class="row"><button type="button" class="addrow" id="claim-create"${off ? " disabled" : ""}>${clBusy ? T.clCreating : T.clCreate}</button></div></div>
+      ${!named.length || !items.length ? `<p class="foot">${T.clNeed}</p>` : ""}${clErr ? `<p class="foot">${esc(clErr)}</p>` : ""}`;
+  }
+  const url = claimUrl(), claims = (CL && CL.claims) || {};
+  const done = named.filter(p => claims[clName(p)]), waiting = named.filter(p => !claims[clName(p)] && p.id !== PID()).map(clName);
+  const noOwner = items.filter(f => !f.who.length);
+  return `<div class="group-title"><span>${T.clTitle}</span>${CL ? `<span class="pill ok">${T.clStatus(done.length, named.length)}</span>` : ""}</div>
+    <div class="group">
+      <div class="row"><span class="cl-link">${esc(url.replace(/^https?:\/\//, ""))}</span><button type="button" class="link" id="claim-copy">${T.clCopy}</button></div>
+      <div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.clMsg(url, S.title))}" target="_blank" rel="noopener">${T.clShare}</a></div>
+    </div>
+    <div class="group" style="margin-top:12px">
+      ${named.map(p => { const c = claims[clName(p)]; return `<div class="row"><span class="lbl" style="flex:1 1 auto">${pname(p)}</span>${c ? `<span class="val">${T.clItems(c.items.length)}</span> <span class="pill ok">${T.clDone}</span>` : `<span class="pill warn">${T.clWait}</span>`}</div>`; }).join("")}
+      <div class="row"><span class="lbl">${T.clNoOwner}</span><span class="val" style="white-space:normal;text-align:right">${noOwner.length ? esc(noOwner.map(f => f.name || T.food).join(", ")) : T.clAllOwned}</span></div>
+      ${waiting.length && !(CL && CL.closed) ? `<div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.clRemindMsg(waiting.join(", "), url))}" target="_blank" rel="noopener">${T.clRemind}</a></div>` : ""}
+      <div class="row"><button type="button" class="addrow" id="claim-refresh">${T.clRefresh}</button></div>
+    </div>
+    <p class="foot">${CL && CL.closed ? T.clClosed + " " : ""}${T.clNote}${clErr ? " " + esc(clErr) : ""}</p>
+    <button type="button" class="clear-page" id="claim-stop">${T.clStop}</button>`;
+}
+function viewPays(T, res) {
+  if (!S.claim) return "";
+  if (!S.claim.sent) return `<p class="foot">${T.payStart}</p>`;
+  const rows = res.rows.filter(r => clName(r.p) && r.p.id !== PID()), pays = (CL && CL.pays) || {};
+  const st = r => pays[clName(r.p)] && pays[clName(r.p)].status;
+  const paid = rows.filter(r => st(r) === "paid"), got = paid.reduce((a, r) => a + r.final, 0);
+  const waiting = rows.filter(r => !st(r)).map(r => clName(r.p));
+  return `<div class="group-title"><span>${T.payTitle}</span><span class="pill ok">${T.payOf(paid.length, rows.length)}</span></div>
+    <div class="group">
+      <div class="row"><span class="lbl">${T.payIn}</span><span class="val">${rp(got)} / ${rp(rows.reduce((a, r) => a + r.final, 0))}</span></div>
+      ${rows.map(r => {
+        const n = clName(r.p), p = pays[n], s = p && p.status;
+        const pill = s === "paid" ? `<span class="pill ok">${T.payPaid}</span>` : s === "sent" ? `<span class="pill sent">${T.paySent}</span>` : `<span class="pill warn">${T.payNone}</span>`;
+        const acts = s === "sent" ? `${p.proof ? `<button type="button" class="chip" data-pay-proof="${esc(n)}">${T.payProof}</button>` : ""}<button type="button" class="chip" aria-pressed="true" data-pay-ok="${esc(n)}">${T.payRecv}</button>`
+          : s === "paid" ? `<button type="button" class="chip" data-pay-undo="${esc(n)}">${T.payUndo}</button>`
+          : `<button type="button" class="chip" data-pay-ok="${esc(n)}">${T.payCash}</button>`;
+        return `<div class="row"><span class="lbl" style="flex:1 1 auto">${pname(r.p)}<span class="pay-amt">${rb(r.final)}</span></span>${pill}</div><div class="chips pay-acts">${acts}</div>`;
+      }).join("")}
+      ${waiting.length ? `<div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.payRemindMsg(waiting.join(", "), claimUrl()))}" target="_blank" rel="noopener">${T.payRemind}</a></div>` : ""}
+    </div>
+    <p class="foot">${T.payNote}${clErr ? " " + esc(clErr) : ""}</p>`;
+}
+async function clPay(name, status) {
+  if (!S.claim) return;
+  CL = CL || { claims: {}, pays: {} };
+  const was = CL.pays[name];
+  if (status === "paid") CL.pays[name] = { status: "paid", proof: !!(was && was.proof) }; else delete CL.pays[name];
+  render(true);
+  try { await clFetch(`/${S.claim.code}/confirm`, { method: "POST", body: JSON.stringify({ name, status }) }); }
+  catch (e) { if (was) CL.pays[name] = was; else delete CL.pays[name]; clErr = clMsgErr(e); render(true); }
+}
+async function showProof(name) {
+  const T = L(), box = (body) => sheet(`<h3>${esc(T.proofTitle(name))}</h3>${body}<div class="btns" style="grid-template-columns:1fr"><button type="button" class="btn btn-copy" data-sheet="close">${T.close}</button></div>`);
+  box(`<p class="muted">${T.loadingDots}</p>`);
+  try {
+    const j = await clFetch(`/${S.claim.code}/proof/${encodeURIComponent(name)}`);
+    box(j.proof && /^data:image\//.test(j.proof) ? `<img class="proof-img" src="${j.proof}" alt="${esc(T.proofTitle(name))}">` : `<p class="muted">${T.proofNone}</p>`);
+  } catch (e) { box(`<p class="muted">${esc(clMsgErr(e))}</p>`); }
+}
+function claimClick(b, T) {
+  const d = b.dataset;
+  if (b.id === "claim-create") { claimCreate(); return true; }
+  if (b.id === "claim-refresh") { claimSync(); return true; }
+  if (b.id === "claim-copy") {
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(T.selectFallback); };
+    try { navigator.clipboard.writeText(claimUrl()).then(() => toast(T.clCopied), fallback); } catch (err) { fallback(); }
+    return true;
+  }
+  if (b.id === "claim-stop") {
+    if (!confirm(T.clStopConfirm)) return true;
+    const c = S.claim; S.claim = null; CL = null; clErr = "";
+    clFetch("/" + c.code, { method: "PUT", body: JSON.stringify({ closed: true }) }, c.admin).catch(() => {});
+    render(true); return true;
+  }
+  if (d.payOk !== undefined || d.payUndo !== undefined) { clPay(d.payOk ?? d.payUndo, d.payOk !== undefined ? "paid" : "none"); return true; }
+  if (d.payProof !== undefined) { showProof(d.payProof); return true; }
+  return false;
+}
+$("content").addEventListener("click", e => { if (e.target.closest("#send-wa")) claimSent(); });
+setInterval(() => { if (S.claim && document.visibilityState === "visible" && ["food", "bill"].includes(tab)) claimSync(true); }, 15000);
+document.addEventListener("visibilitychange", () => { if (S.claim && document.visibilityState === "visible") claimSync(true); });
 
 // ---------- Bill photo: read food items and prices on the phone (Tesseract.js OCR) ----------
 // The installed app serves the reader from its own vendor/ folder (cached for offline use); the mockup page uses the CDN.
