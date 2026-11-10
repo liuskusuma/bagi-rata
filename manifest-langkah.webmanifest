@@ -1,7 +1,7 @@
 {
   "name": "Bagi Rata Langkah",
   "short_name": "BR Langkah",
-  "description": "Bagi biaya main tenis dan kirim tagihannya ke WhatsApp.",
+  "description": "Bagi biaya olahraga dan patungan, lalu kirim tagihannya ke WhatsApp.",
   "lang": "id",
   "start_url": "langkah.html?mode=guided",
   "scope": "./",

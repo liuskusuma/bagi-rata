@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Bagi Rata Langkah</title>
-<meta name="description" content="Bagi biaya main tenis: lapangan, ballboy, bola, dan makanan, lalu kirim tagihannya ke WhatsApp.">
+<meta name="description" content="Bagi biaya olahraga (tenis, padel, bulutangkis, dan lainnya): lapangan, bola atau kok, dan makanan, lalu kirim tagihannya ke WhatsApp.">
 <meta name="theme-color" content="#0a2a72">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -238,6 +238,19 @@ a.addrow { display: block; text-decoration: none; }
 .kind .tx { flex: 1 1 auto; display: grid; gap: 4px; }
 .kind b { font-family: var(--f-display); font-weight: 800; font-size: 20px; }
 .kind small { font-size: 14px; color: var(--muted); line-height: 1.35; }
+.kind .sport-now { font-style: normal; font-weight: 600; color: var(--accent-text, var(--accent)); }
+.sports { margin-top: -6px; }
+.sports-ask { font-family: var(--f-display); font-weight: 700; font-size: 15px; color: var(--chalk); opacity: .9; margin: 0 4px 10px; }
+[data-skin] .sports-ask { color: var(--muted); opacity: 1; }
+.sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sports.in-set { width: 100%; padding: 6px 0; }
+.sport { display: grid; justify-items: center; gap: 6px; padding: 12px 4px 10px; border-radius: 16px; background: var(--cell); color: var(--fg); font-size: 13.5px; font-weight: 600; }
+[data-skin] .sport { border-radius: 20px; box-shadow: var(--raised-sm); }
+.sports.in-set .sport { background: var(--well, rgba(0,0,0,.06)); box-shadow: var(--inset-sm, none); }
+.sport .sic { width: 34px; height: 34px; display: grid; place-items: center; color: var(--accent-text, var(--accent)); }
+.sport .sic svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sport[aria-pressed="true"], .sports.in-set .sport[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: none; }
+.sport[aria-pressed="true"] .sic { color: var(--accent-ink); }
 .kind .chev { color: var(--muted); font-size: 22px; }
 .chip.all { font-weight: 600; }
 .tag.payer { font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent); border-radius: 99px; padding: 3px 9px; margin-left: auto; flex: 0 0 auto; }
@@ -377,7 +390,7 @@ const STR = {
     foodOn: "Ada pembagian makanan", food: "Makanan", foodName: "Nama makanan", price: "Harga", each: "Per orang", shared: "Dibagi", addFood: "+ Tambah makanan",
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
-    clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" tetap kamu yang atur di bawah.",
+    clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" kamu yang atur di bawah; teman yang ikut makan bisa menambahkan dirinya.",
     clCreate: "Buat link klaim", clCreating: "Membuat link…", clNeed: "Isi nama orang dan item makanan dulu.",
     clFail: "Gagal terhubung ke server. Cek internet lalu coba lagi.", clNoDb: "Link klaim belum disiapkan di server (database D1 belum dipasang).",
     clShare: "Kirim link ke grup WhatsApp", clCopy: "Salin", clCopied: "Link tersalin",
@@ -385,7 +398,7 @@ const STR = {
     clStatus: (a, b) => `${a}/${b} sudah klaim`, clRefresh: "Perbarui sekarang", clDone: "Sudah", clWait: "Belum klaim", clItems: n => `${n} item`,
     clNoOwner: "Belum ada pemilik", clAllOwned: "Tidak ada, semua sudah ada pemiliknya",
     clRemind: "Ingatkan yang belum klaim", clRemindMsg: (n, u) => `Halo ${n}, jangan lupa klaim makananmu ya 🙏\n${u}`,
-    clNote: "Klaim yang masuk otomatis mencentang nama di item \"Per orang\" (dicek tiap 15 detik). Kamu tetap bisa ubah sendiri. Item tanpa pemilik bisa kamu centangkan atau jadikan \"Dibagi\".",
+    clNote: "Klaim yang masuk otomatis mencentang nama di item \"Per orang\", dan di item \"Dibagi\" kalau teman mencentang \"ikut makan\" (dicek tiap 15 detik). Kamu tetap bisa ubah sendiri. Item tanpa pemilik bisa kamu centangkan atau jadikan \"Dibagi\".",
     clClosed: "Klaim sudah ditutup karena tagihan sudah dikirim.", clStop: "Hapus link klaim", clStopConfirm: "Hapus link klaim dari tagihan ini? Link lama tidak bisa dipakai lagi.",
     payTitle: "Pembayaran", payOf: (a, b) => `${a}/${b} lunas`, payIn: "Sudah masuk", paySent: "Katanya sudah transfer", payPaid: "Lunas", payNone: "Belum bayar",
     payRecv: "Diterima", payCash: "Tandai lunas (tunai)", payUndo: "Batal", payProof: "Lihat bukti",
@@ -402,9 +415,9 @@ const STR = {
     sideSample: "Semua isian mulai kosong dan tersimpan di HP/browser masing-masing.", reset: "Kosongkan semua data", guide: "Warna tema ini", guideType: "Outfit untuk judul dan angka besar, Plus Jakarta Sans untuk teks.", settings: "Setelan",
     offerTitle: "Baru pertama kali?", offerText: "Mode Terpandu menuntun Anda satu halaman per langkah sampai tagihan siap dikirim.", offerYes: "Coba Terpandu", offerNo: "Pakai Standar", offerNote: "Bisa diganti kapan saja di Setelan > Tampilan.",
     kindAsk: "Mau bagi apa?", kindIntro: "Pilih jenisnya. Isian yang tidak dipakai akan disembunyikan.", kindTitle: "Jenis tagihan", kindSub: "Pilih jenis tagihan",
-    tennis: "Tenis", split: "Split Bill", tennisDesc: "Lapangan, jam main, ballboy, bola, dan makanan", splitDesc: "Makan bareng, belanja, atau patungan apa saja",
+    tennis: "Olahraga", split: "Split Bill", tennisDesc: "Lapangan, jam main, bola atau kok, dan makanan", sportAsk: "Olahraga apa?", sportNote: "Hitungannya sama untuk semua olahraga. Yang berubah hanya nama biaya dan contoh isian.", splitDesc: "Makan bareng, belanja, atau patungan apa saja",
     remember: "Ingat pilihan saya", rememberNote: "Kalau dinyalakan, layar ini dilewati waktu aplikasi dibuka. Jenis tagihan tetap bisa diganti di sini, di Setelan, atau lewat tombol di header.",
-    kindNote: "Isian Tenis dan Split Bill disimpan terpisah, jadi pindah jenis tidak menghapus apa pun.",
+    kindNote: "Isian Olahraga dan Split Bill disimpan terpisah, jadi pindah jenis tidak menghapus apa pun.",
     extras: "Biaya lain (dibagi rata)", addExtra: "+ Ongkir, parkir, dll.", extraNote: "Dibagi sama besar ke semua orang. Service dan pajak tidak dikenakan ke biaya ini.", extraName: "Parkir",
     all: "Semua", payer: "Dibayar oleh", payerNone: "Tidak ada", payerTag: "bayar duluan", payerNote: "Yang bayar duluan ikut menanggung bagiannya, tapi tidak ditagih di pesan.", known: "Pernah ikut", eventNote: "Judul jadi baris pertama pesan. Tempat boleh dikosongkan."
   },
@@ -428,7 +441,7 @@ const STR = {
     foodOn: "Split food", food: "Food", foodName: "Food name", price: "Price", each: "Each", shared: "Shared", addFood: "+ Add food",
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
-    clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. \"Shared\" items stay yours to set below.",
+    clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. You set \"Shared\" items below; friends who had some can add themselves.",
     clCreate: "Create claim link", clCreating: "Creating link…", clNeed: "Add people and food items first.",
     clFail: "Couldn't reach the server. Check your connection and try again.", clNoDb: "Claim links aren't set up on the server yet (the D1 database isn't connected).",
     clShare: "Send the link to the WhatsApp group", clCopy: "Copy", clCopied: "Link copied",
@@ -436,7 +449,7 @@ const STR = {
     clStatus: (a, b) => `${a}/${b} claimed`, clRefresh: "Refresh now", clDone: "Done", clWait: "Not claimed", clItems: n => n === 1 ? "1 item" : `${n} items`,
     clNoOwner: "No owner yet", clAllOwned: "None, every item has an owner",
     clRemind: "Remind those who haven't claimed", clRemindMsg: (n, u) => `Hi ${n}, don't forget to claim your food 🙏\n${u}`,
-    clNote: "Claims tick names on \"Each\" items automatically (checked every 15 seconds). You can still change them yourself. Tick someone on items with no owner, or make them \"Shared\".",
+    clNote: "Claims tick names on \"Each\" items automatically, and on \"Shared\" items when a friend ticks \"I had some\" (checked every 15 seconds). You can still change them yourself. Tick someone on items with no owner, or make them \"Shared\".",
     clClosed: "Claims are closed because the bill has been sent.", clStop: "Remove claim link", clStopConfirm: "Remove the claim link from this bill? The old link will stop working.",
     payTitle: "Payments", payOf: (a, b) => `${a}/${b} paid`, payIn: "Received", paySent: "Says transferred", payPaid: "Paid", payNone: "Not paid",
     payRecv: "Received", payCash: "Mark paid (cash)", payUndo: "Undo", payProof: "See proof",
@@ -453,9 +466,9 @@ const STR = {
     sideSample: "Everything starts blank and is saved on each phone or browser.", reset: "Clear all data", guide: "Colors in this theme", guideType: "Outfit for titles and big numbers, Plus Jakarta Sans for text.", settings: "Settings",
     offerTitle: "First time here?", offerText: "Guided mode walks you through one page per step until the bill is ready to send.", offerYes: "Try Guided", offerNo: "Use Standard", offerNote: "You can change this any time in Settings > Layout.",
     kindAsk: "What are you splitting?", kindIntro: "Pick one. Fields you don't need are hidden.", kindTitle: "Bill type", kindSub: "Choose a bill type",
-    tennis: "Tennis", split: "Split Bill", tennisDesc: "Courts, hours played, ball boy, balls and food", splitDesc: "A meal out, shopping, or chipping in for anything",
+    tennis: "Sports", split: "Split Bill", tennisDesc: "Courts, hours played, balls or shuttles, and food", sportAsk: "Which sport?", sportNote: "The math is the same for every sport. Only the cost names and examples change.", splitDesc: "A meal out, shopping, or chipping in for anything",
     remember: "Remember my choice", rememberNote: "When on, this screen is skipped when the app opens. You can still switch here, in Settings, or with the button in the header.",
-    kindNote: "Tennis and Split Bill entries are kept apart, so switching never clears anything.",
+    kindNote: "Sports and Split Bill entries are kept apart, so switching never clears anything.",
     extras: "Other costs (split evenly)", addExtra: "+ Delivery, parking, etc.", extraNote: "Split evenly among everyone. Service and tax are not added to these.", extraName: "Parking",
     all: "All", payer: "Paid by", payerNone: "Nobody", payerTag: "paid", payerNote: "Whoever paid first still has a share, but is left out of the message.", known: "Joined before", eventNote: "The title is the first line of the message. Place is optional."
   }
@@ -565,15 +578,26 @@ new MutationObserver(applyCourt).observe(document.documentElement, { attributes:
 const KEY = "bagi-rata-v3", KEY_SPLIT = "bagi-rata-split-v1", PKEY = "bagi-rata-iphone-prefs", OLD_KEYS = ["bagi-rata-steps-v1", "bagi-rata-iphone-v2"];
 // New sessions start blank; the three usual cost rows are kept as named placeholders.
 // New bills start with names in the app language (English unless the phone chose Indonesian).
+// Sports share one calculation; a sport only changes names, icons and the starting cost rows.
+const SPORTS = {
+  tennis: { id: "Tenis", en: "Tennis", ph: "COS Match #4", costs: id => [["Ball boy", "Ball boy"], [id ? "Bola baru" : "New balls"]] },
+  padel: { id: "Padel", en: "Padel", ph: "Padel Jumat", costs: id => [[id ? "Bola baru" : "New balls"], [id ? "Sewa raket" : "Racket rental"]] },
+  badminton: { id: "Bulutangkis", en: "Badminton", ph: "Badminton Kamis", costs: id => [[id ? "Kok" : "Shuttlecocks"]] },
+  pickleball: { id: "Pickleball", en: "Pickleball", ph: "Pickleball Minggu", costs: id => [[id ? "Bola baru" : "New balls"]] },
+  futsal: { id: "Futsal", en: "Futsal", ph: "Futsal Kantor", costs: id => [[id ? "Wasit" : "Referee"], [id ? "Air minum" : "Drinking water"]] },
+  other: { id: "Lainnya", en: "Other", ph: "Main bareng", costs: () => [] }
+};
+const sport = () => SPORTS[P?.sport] ? P.sport : "tennis";
+const sportName = (k = sport()) => SPORTS[k][(P?.lang || "en") === "id" ? "id" : "en"];
+const sportCosts = (k = sport(), id = (P?.lang || "en") === "id") => [
+  { id: "c1", name: id ? "Lapangan" : "Court", amount: 0, split: "hours" },
+  ...SPORTS[k].costs(id).map((c, i) => ({ id: "c" + (i + 2), name: c[0], amount: 0, split: "equal" }))
+];
 const TENNIS_SAMPLE = (id = (P?.lang || "en") === "id") => ({
   title: "", vs: "", date: "", venue: "",
   courts: [{ id: "k1", name: id ? "Lapangan 1" : "Court 1", start: "", hours: 2 }],
   bankName: "", bankNo: "", bankHolder: "", round: "1000",
-  costs: [
-    { id: "c1", name: id ? "Lapangan" : "Court", amount: 0, split: "hours" },
-    { id: "c2", name: "Ball boy", amount: 0, split: "equal" },
-    { id: "c3", name: id ? "Bola baru" : "New balls", amount: 0, split: "equal" }
-  ],
+  costs: sportCosts(sport(), id),
   players: [],
   partial: [],
   foodOn: false,
@@ -738,7 +762,7 @@ function compute() {
 // "BCA 6300102008 a/n Winarto Kusuma", leaving out whatever is blank.
 const bankLine = () => [S.bankName, S.bankNo, S.bankHolder ? "a/n " + S.bankHolder : ""].map(x => (x || "").trim()).filter(Boolean).join(" ");
 function buildMessage(res) {
-  const lines = S.title ? [S.title] : [];
+  const lines = S.title ? [S.title] : isSplit() ? [] : [sportName()];
   if (S.vs) lines.push("", "VS " + S.vs);
   if (lines.length) lines.push("");
   const dl = dateLine(S.date); if (dl) lines.push(dl);
@@ -789,7 +813,7 @@ function viewMatch(T) {
   return `
     <div class="group-title">${T.match}</div>
     <div class="group">
-      <div class="row"><label for="s-title">${T.title}</label><input id="s-title" data-s="title" value="${esc(S.title)}" placeholder="COS Match #4"></div>
+      <div class="row"><label for="s-title">${T.title}</label><input id="s-title" data-s="title" value="${esc(S.title)}" placeholder="${esc(SPORTS[sport()].ph)}"></div>
       <div class="row"><label for="s-vs">${T.vs}</label><input id="s-vs" data-s="vs" value="${esc(S.vs)}" placeholder="${T.optional}"></div>
     </div>
     <p class="foot">${T.matchNote}</p>`;
@@ -990,6 +1014,11 @@ function viewTagihan(T) {
 
 const KIND_ICON = {
   tennis: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6c3.2 3.2 3.2 9.6 0 12.8M18.4 5.6c-3.2 3.2-3.2 9.6 0 12.8"/></svg>',
+  padel: '<svg viewBox="0 0 24 24"><path d="M10 2.8c3.9 0 6.6 2.7 6.6 6.4 0 2.7-1.4 4.6-3.4 5.6l-.9 2.2h-4.6l-.9-2.2c-2-1-3.4-2.9-3.4-5.6 0-3.7 2.7-6.4 6.6-6.4z"/><path d="M8.6 17h2.8v4.2H8.6z"/><circle cx="8" cy="8" r=".5"/><circle cx="12" cy="8" r=".5"/><circle cx="10" cy="11" r=".5"/><circle cx="19" cy="18" r="2.2"/></svg>',
+  badminton: '<svg viewBox="0 0 24 24"><path d="M8.5 13.5L4 4h16l-4.5 9.5z"/><path d="M8.5 13.5h7M9.5 4l1.3 9.5M14.5 4l-1.3 9.5"/><path d="M8.5 13.5a3.5 3.5 0 0 0 7 0"/></svg>',
+  pickleball: '<svg viewBox="0 0 24 24"><rect x="3.5" y="2.5" width="11" height="12.5" rx="5.5"/><path d="M8 15v3.5h2V15M8 18.5v3h2v-3"/><circle cx="18.5" cy="17.5" r="2.5"/></svg>',
+  futsal: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l3.8 2.8-1.5 4.5H9.7l-1.5-4.5z"/><path d="M12 3v4.6M15.8 10.4l4.6-1.5M14.3 14.9l2.8 3.9M9.7 14.9l-2.8 3.9M8.2 10.4L3.6 8.9"/></svg>',
+  other: '<svg viewBox="0 0 24 24"><path d="M8 3.5h8v5.5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3 4.5M16 5.5h3a3 3 0 0 1-3 4.5M12 13v4M8.5 21h7M10 17h4v4h-4z"/></svg>',
   split: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>'
 };
 function viewKind(T) {
@@ -1000,11 +1029,21 @@ function viewKind(T) {
     <div class="kind-head"><h3>${T.kindAsk}</h3><p>${T.kindIntro}</p></div>
     <div class="kinds">${["tennis", "split"].map(k => `
       <button type="button" class="kind" data-kind="${k}" aria-pressed="${(P.kind || "tennis") === k}">
-        <span class="ic">${KIND_ICON[k]}</span><span class="tx"><b>${T[k]}</b><small>${T[k + "Desc"]}</small></span><span class="chev" aria-hidden="true">›</span>
-      </button>`).join("")}</div>
+        <span class="ic">${KIND_ICON[k === "tennis" ? sport() : k]}</span><span class="tx"><b>${T[k]}${k === "tennis" ? ` <em class="sport-now">· ${sportName()}</em>` : ""}</b><small>${T[k + "Desc"]}</small></span><span class="chev" aria-hidden="true">›</span>
+      </button>${k === "tennis" ? sportPicker(T) : ""}`).join("")}</div>
     <div class="group" style="margin-top:28px"><div class="row"><span class="lbl">${T.remember}</span>
       <button type="button" class="switch" role="switch" id="kind-remember" aria-checked="${!!P.rememberKind}" aria-label="${T.remember}"></button></div></div>
     <p class="foot">${T.rememberNote} ${T.kindNote}</p>`;
+}
+function sportPicker(T, inSettings) {
+  return `<div class="sports${inSettings ? " in-set" : ""}">${inSettings ? "" : `<div class="sports-ask">${T.sportAsk}</div>`}
+    <div class="sport-grid">${Object.keys(SPORTS).map(k => `<button type="button" class="sport" data-sport="${k}" aria-pressed="${!isSplit() && sport() === k}"><span class="sic">${KIND_ICON[k]}</span>${sportName(k)}</button>`).join("")}</div></div>`;
+}
+// Picking a sport keeps the entries; untouched starting cost rows switch to that sport's rows.
+function setSport(k) {
+  const fresh = S.costs.every(c => !c.amount) && JSON.stringify(S.costs.map(c => c.name)) === JSON.stringify(sportCosts().map(c => c.name));
+  P.sport = k;
+  if (fresh) S.costs = sportCosts(k);
 }
 // Switching bill type saves the current entries and opens the other type's own.
 function setKind(k) {
@@ -1015,7 +1054,7 @@ function setKind(k) {
 function viewSetelan(T) {
   return `
     <div class="group-title">${T.kindTitle}</div>
-    <div class="group"><div class="row">${seg('data-pref="kind"', P.kind || "tennis", [["tennis", T.tennis], ["split", T.split]])}</div>
+    <div class="group"><div class="row">${seg('data-pref="kind"', P.kind || "tennis", [["tennis", T.tennis], ["split", T.split]])}</div>${isSplit() ? "" : `<div class="row">${sportPicker(T, true)}</div>`}
       <div class="row"><span class="lbl">${T.remember}</span><button type="button" class="switch" role="switch" id="kind-remember" aria-checked="${!!P.rememberKind}" aria-label="${T.remember}"></button></div></div>
     <p class="foot">${T.kindNote}</p>
     <div class="group-title">${T.mode}</div>
@@ -1040,13 +1079,14 @@ const CLEARS = {
   pay: () => { S.bankName = ""; S.bankNo = ""; S.bankHolder = ""; S.payer = ""; },
   sesi: () => { CLEARS.match(); CLEARS.place(); CLEARS.pay(); },
   players: () => { S.players = []; S.partial = []; for (const f of S.foodItems) f.who = []; },
-  cost: () => { S.costs = TENNIS_SAMPLE().costs; },
+  cost: () => { S.costs = sportCosts(); },
   food: () => { S.foodItems = []; S.foodOn = isSplit(); S.foodSvc = 0; S.foodTax = true; if (isSplit()) S.costs = []; },
   event: () => { S.title = ""; S.date = ""; S.venue = ""; if (!guided()) CLEARS.pay(); }
 };
 const clearBtn = T => CLEARS[tab] ? `<button type="button" class="clear-page" id="clear-page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>${T.clearPage}</button>` : "";
 const VIEWS = { kind: viewKind, event: T => viewEvent(T) + (guided() ? "" : viewPay(T)), sesi: T => viewMatch(T) + viewPlace(T) + viewPay(T), match: viewMatch, place: viewPlace, pay: viewPay, players: viewPemain, cost: viewBiaya, food: viewMakanan, bill: viewTagihan, setelan: viewSetelan };
 
+const subOf = (T, k) => k === "cost" && !isSplit() ? sportCosts().map(c => c.name).join(", ") : k === "sesi" || k === "match" ? `${sportName()} · ${T.subs[k]}` : T.subs[k];
 function renderChrome() {
   const T = L(), t = COURTS[P.court];
   document.documentElement.lang = P.lang;
@@ -1055,8 +1095,8 @@ function renderChrome() {
   $("guide-sw").innerHTML = [t.deep, t.base, t.hi, t.head, "#f4f2ea", t.accentDark].map(c => `<span style="background:${c}"></span>`).join("");
   $("gear").setAttribute("aria-label", T.settings); $("gear").setAttribute("aria-pressed", tab === "setelan");
   const k = P.kind || "tennis";
-  $("kindsw").innerHTML = KIND_ICON[k];
-  $("kindsw").setAttribute("aria-label", `${T.kindTitle}: ${T[k]}`); $("kindsw").title = $("kindsw").getAttribute("aria-label"); $("kindsw").setAttribute("aria-pressed", tab === "kind");
+  $("kindsw").innerHTML = KIND_ICON[k === "tennis" ? sport() : k];
+  $("kindsw").setAttribute("aria-label", `${T.kindTitle}: ${k === "tennis" ? sportName() : T[k]}`); $("kindsw").title = $("kindsw").getAttribute("aria-label"); $("kindsw").setAttribute("aria-pressed", tab === "kind");
   $("tabs").hidden = tab === "kind";
 }
 function render(keepScroll) {
@@ -1064,7 +1104,7 @@ function render(keepScroll) {
   const T = L(), content = $("content"), top = content.scrollTop, i = steps().indexOf(tab);
   $("tabs").className = "stepbar"; $("tabs").style.gridTemplateColumns = ""; $("progress").hidden = i < 0;
   $("nav-title").textContent = T.tabs[tab];
-  $("nav-sub").textContent = i >= 0 ? `${T.stepOf(i + 1, steps().length)} · ${T.subs[tab]}` : T.subs[tab];
+  $("nav-sub").textContent = i >= 0 ? `${T.stepOf(i + 1, steps().length)} · ${subOf(T, tab)}` : subOf(T, tab);
   $("progress").innerHTML = steps().map((k, j) => `<button type="button" data-tab="${k}" class="${j <= i ? "done" : ""}" aria-label="${T.tabs[k]}"${k === tab ? ' aria-current="step"' : ""}></button>`).join("");
   content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
@@ -1078,7 +1118,7 @@ function render(keepScroll) {
 function renderTabs(keepScroll) {
   const T = L(), content = $("content"), top = content.scrollTop;
   $("nav-title").textContent = T.tabs[tab];
-  $("nav-sub").textContent = T.subs[tab];
+  $("nav-sub").textContent = subOf(T, tab);
   $("progress").hidden = true;
   content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
@@ -1159,6 +1199,7 @@ $("content").addEventListener("click", e => {
   const d = b.dataset, T = L();
   if (claimClick(b, T)) return;
   if (d.offer) { setMode(d.offer); delete P.offerGuided; back = firstTab(); }
+  else if (d.sport) { if (isSplit()) setKind("tennis"); setSport(d.sport); }
   else if (d.kind) { delete P.offerGuided; const same = P.kind === d.kind && back !== "kind"; setKind(d.kind); tab = same ? back : back = firstTab(); }
   else if (b.id === "kind-remember") P.rememberKind = !P.rememberKind;
   else if (d.pref === "kind") { setKind(d.v); back = firstTab(); }
@@ -1304,10 +1345,16 @@ function applyClaims() {
   for (const [name, c] of Object.entries(CL.claims || {})) {
     if (ap[name] >= c.updated) continue;
     const p = S.players.find(x => clName(x).toLowerCase() === name.toLowerCase()); if (!p) continue;
-    for (const f of S.foodItems) if (f.mode !== "split") {
+    const joined = (S.claim.joined || (S.claim.joined = {}))[name] || [];
+    for (const f of S.foodItems) {
       const want = c.items.includes(f.id), has = f.who.includes(p.id);
-      if (want && !has) f.who = f.who.concat(p.id); else if (!want && has) f.who = f.who.filter(x => x !== p.id);
+      if (f.mode !== "split") {
+        if (want && !has) f.who = f.who.concat(p.id); else if (!want && has) f.who = f.who.filter(x => x !== p.id);
+      } else if (want && !has) { f.who = f.who.concat(p.id); joined.push(f.id); }
+      // On a shared item a friend can only take back their own "I had some", never a name the payer picked.
+      else if (!want && has && joined.includes(f.id)) { f.who = f.who.filter(x => x !== p.id); joined.splice(joined.indexOf(f.id), 1); }
     }
+    S.claim.joined[name] = [...new Set(joined)];
     ap[name] = c.updated;
   }
 }

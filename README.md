@@ -19,9 +19,11 @@ Folder ini berisi aplikasi Bagi Rata versi web yang bisa dipasang di iPhone lewa
 
 Data tiap orang (pemain, biaya, tema, bahasa) tersimpan di HP masing-masing.
 
-## Tenis dan Split Bill
+## Olahraga dan Split Bill
 
-Saat aplikasi dibuka, pengguna memilih **Tenis** (lapangan, jam main, ballboy, bola, makanan) atau **Split Bill** (hanya orang, item nota, service/pajak, dan biaya lain yang dibagi rata). Isian kedua jenis disimpan terpisah. "Ingat pilihan saya" melewati layar pilihan; jenis tagihan bisa diganti lewat tombol di header atau di Setelan.
+Saat aplikasi dibuka, pengguna memilih **Olahraga** (lapangan, jam main, bola atau kok, makanan; jenisnya Tenis, Padel, Bulutangkis, Pickleball, Futsal, atau Lainnya) atau **Split Bill** (hanya orang, item nota, service/pajak, dan biaya lain yang dibagi rata). Isian kedua jenis disimpan terpisah. "Ingat pilihan saya" melewati layar pilihan; jenis tagihan bisa diganti lewat tombol di header atau di Setelan.
+
+Hitungan semua olahraga sama (lapangan dibagi per jam per orang). Olahraga yang dipilih hanya mengubah ikon, contoh judul, dan baris biaya awal: Tenis (ballboy, bola baru), Padel (bola baru, sewa raket), Bulutangkis (kok), Pickleball (bola baru), Futsal (wasit, air minum), Lainnya (hanya lapangan). Baris biaya yang belum diisi ikut berganti saat olahraga diganti; yang sudah diisi tidak diubah. Kalau judul kosong, baris pertama pesan WA memakai nama olahraganya.
 
 ## Klaim lewat link
 
