@@ -34,7 +34,8 @@ function people(bill) {
 }
 
 export async function handleClaim(request, env, headers) {
-  const db = env.DB;
+  // Any D1 binding works; DB is the suggested name.
+  const db = env.DB || Object.values(env).find(v => v && typeof v.prepare === "function" && typeof v.batch === "function");
   if (!db) return json({ error: "no_db" }, 503, headers);
   await ensure(db);
   const url = new URL(request.url);

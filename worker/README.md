@@ -21,7 +21,8 @@ friends open `k.html?c=CODE`, pick their name and tick what they ordered, and la
 transferred. It needs a D1 database bound as `DB`; the tables are created on first use.
 
 1. Cloudflare: Storage & Databases, D1 SQL Database, Create, name it `bagi-rata`.
-2. Workers & Pages, `bagi-rata-scan`, Settings, Bindings, Add, D1 database: variable name `DB`, database `bagi-rata`.
+2. Workers & Pages, `bagi-rata-scan`, Settings, Bindings, Add, D1 database: variable name `DB`, database `bagi-rata`
+   (any name works: the worker finds the D1 binding by itself).
 3. Edit code: paste the new `dist/worker.js` again, then Deploy.
 
 Without the binding the app says claim links are not set up yet; photo reading keeps working.
