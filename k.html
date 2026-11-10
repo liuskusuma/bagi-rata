@@ -113,7 +113,7 @@ const STR = {
     title: "Nota makanan", sub: p => `${p} yang menagih`, whoAreYou: "Kamu siapa?", noApp: "Tanpa aplikasi atau akun. Pilih nama untuk mulai.",
     claimed: "Sudah", payerTag: "Penagih", tickTitle: "Kamu pesan apa?", tickSub: n => `Halo ${n}! Centang semua yang kamu pesan.`,
     alsoBy: n => `Juga dipesan ${n}`, sharedGroup: p => `Sharing (diatur ${p})`, splitN: n => `Dibagi ${n} orang`, youIn: "kamu ikut", youOut: "kamu tidak ikut",
-    sharedNote: p => `${p} yang atur siapa ikut. Kalau ada yang kurang pas, bilang di grup ya.`, noItems: "Belum ada item di nota ini.",
+    sharedNote: p => `${p} sudah pilih siapa yang ikut. Kalau kamu juga ikut makan, centang item-nya.`, youInSet: p => `kamu ikut (diatur ${p})`, joinHint: "centang kalau kamu ikut makan", noItems: "Belum ada item di nota ini.",
     yourTotal: "Total kamu, sudah service & pajak", review: "Cek", reviewTitle: "Bagianmu", yourItems: "Item kamu", nothing: "Kamu belum centang apa pun.",
     subtotal: "Subtotal", service: "Service", tax: "Pajak 10%", total: "Total", shared: "Sharing",
     calcNote: "Service dan pajak dihitung dari subtotal kamu, sama seperti nota.", payTo: "Transfer ke", copy: "Salin", copied: "Tersalin",
@@ -133,7 +133,7 @@ const STR = {
     title: "Food bill", sub: p => `${p} is collecting`, whoAreYou: "Who are you?", noApp: "No app or account needed. Pick your name to start.",
     claimed: "Done", payerTag: "Collecting", tickTitle: "What did you order?", tickSub: n => `Hi ${n}! Tick everything you ordered.`,
     alsoBy: n => `Also ordered by ${n}`, sharedGroup: p => `Shared plates (set by ${p})`, splitN: n => `Split ${n} ways`, youIn: "you're in", youOut: "you're not in",
-    sharedNote: p => `${p} decides who shares these. If something looks wrong, say so in the group.`, noItems: "This bill has no items yet.",
+    sharedNote: p => `${p} has picked who shares these. If you had some too, tick the item.`, youInSet: p => `you're in (set by ${p})`, joinHint: "tick if you had some", noItems: "This bill has no items yet.",
     yourTotal: "Your total, incl. service & tax", review: "Review", reviewTitle: "Your share", yourItems: "Your items", nothing: "You haven't ticked anything.",
     subtotal: "Subtotal", service: "Service", tax: "Tax 10%", total: "Total", shared: "Shared",
     calcNote: "Service and tax are worked out on your subtotal, same as the bill.", payTo: "Pay to", copy: "Copy", copied: "Copied",
@@ -169,10 +169,20 @@ const payer = () => D().payer || (st.lang === "en" ? "The payer" : "Penagih");
 const items = () => (D().items || []).filter(it => it.name || it.price);
 const rate = () => 1 + (+D().svc || 0) / 100 + (D().tax ? .1 : 0);
 const claimOf = n => st.d.claims[n] ? new Set(st.d.claims[n].items) : null;
+// A shared item is split among the people the payer picked plus anyone who ticked "I had some" on this page.
+function sharers(it, ids, n) {
+  const set = new Set(it.who || []);
+  for (const [name, c] of Object.entries(st.d.claims)) if (name !== n && c.items.includes(it.id)) set.add(name);
+  if (set.has(n) && !setByPayer(it, n)) set.delete(n);
+  if (ids.has(it.id)) set.add(n);
+  return [...set];
+}
+// In the payer's list without having ticked it here: the payer put them in, so they can't take themselves out.
+const setByPayer = (it, n) => (it.who || []).includes(n) && !(claimOf(n) || new Set()).has(it.id);
 function subOf(ids, n) {
   let s = 0;
   for (const it of items()) {
-    if (it.shared) { if ((it.who || []).includes(n)) s += (+it.price || 0) / it.who.length; }
+    if (it.shared) { const w = sharers(it, ids, n); if (w.includes(n)) s += (+it.price || 0) / w.length; }
     else if (ids.has(it.id)) s += +it.price || 0;
   }
   return s;
@@ -247,16 +257,18 @@ function render() {
         return `<button type="button" class="row" data-tick="${esc(it.id)}" aria-pressed="${on}" ${d.closed ? "disabled" : ""}><span class="tick">${IC.check}</span><span class="nm">${esc(it.name)}${others.length ? `<small>${esc(t.alsoBy(others.join(", ")))}</small>` : ""}</span><span class="amt ${on ? "" : "mut"}">${rp(it.price)}</span></button>`;
       }).join("")}</div>` : `<p class="foot">${t.noItems}</p>`}
       ${sh.length ? `<div class="gt">${esc(t.sharedGroup(payer()))}</div><div class="card">${sh.map(it => {
-        const who = it.who || [], inn = who.includes(me);
-        return `<div class="row"><span class="ini" aria-hidden="true">${IC.people}</span><span class="nm">${esc(it.name)}<small>${t.splitN(who.length)} · ${inn ? t.youIn : t.youOut}</small></span><span class="amt ${inn ? "" : "mut"}">${inn ? rp(it.price / who.length) : "–"}</span></div>`;
+        const who = sharers(it, st.draft, me), inn = who.includes(me), fixed = setByPayer(it, me);
+        const price = `<span class="amt ${inn ? "" : "mut"}">${inn ? rp(it.price / who.length) : rp(it.price / Math.max(1, who.length + 1))}</span>`;
+        if (fixed) return `<div class="row"><span class="ini" aria-hidden="true">${IC.people}</span><span class="nm">${esc(it.name)}<small>${t.splitN(who.length)} · ${esc(t.youInSet(payer()))}</small></span>${price}</div>`;
+        return `<button type="button" class="row" data-tick="${esc(it.id)}" aria-pressed="${inn}" ${d.closed ? "disabled" : ""}><span class="tick">${IC.check}</span><span class="nm">${esc(it.name)}<small>${t.splitN(who.length)} · ${inn ? t.youIn : t.joinHint}</small></span>${price}</button>`;
       }).join("")}</div><p class="foot">${esc(t.sharedNote(payer()))}</p>` : ""}
       <div class="sum"><div><span class="tt">${t.yourTotal}<b>${rp(total)}</b></span><button class="go" type="button" data-go="review">${t.review}</button></div></div></div>`;
   }
 
   else if (st.view === "review") {
     const s = subOf(st.draft, me), svc = s * (+D().svc || 0) / 100, tax = D().tax ? s * .1 : 0;
-    const rows = items().filter(it => it.shared ? (it.who || []).includes(me) : st.draft.has(it.id)).map(it => {
-      const n = it.shared ? it.who.length : 1;
+    const rows = items().filter(it => it.shared ? sharers(it, st.draft, me).includes(me) : st.draft.has(it.id)).map(it => {
+      const n = it.shared ? sharers(it, st.draft, me).length : 1;
       return `<div class="row"><span class="nm">${esc(it.name)}${it.shared ? `<small>${t.shared} · 1/${n} × ${rp(it.price)}</small>` : ""}</span><span class="amt">${rp(it.price / n)}</span></div>`;
     }).join("");
     html = nav(t.reviewTitle, `${me} · ${where}`, "tick") + `<div class="content">
@@ -288,7 +300,7 @@ function render() {
 
   else if (st.view === "pay") {
     const amount = d.finals[me], p = d.pays[me], status = p && p.status;
-    const c = claimOf(me), food = c || items().some(it => it.shared && (it.who || []).includes(me)) ? subOf(c || new Set(), me) * rate() : 0;
+    const c = claimOf(me), food = subOf(c || new Set(), me) * rate();
     const state = status === "paid"
       ? `<div class="card"><div class="state"><span class="ic">${IC.check}</span><span><b>${t.paidT}</b><small>${esc(t.paidS(payer()))}</small></span></div></div>`
       : status === "sent" ? `<div class="card"><div class="state"><span class="ic">${IC.clock}</span><span><b>${esc(t.waitT(payer()))}</b><small>${esc(t.waitS(payer()))}</small></span></div></div>` : "";

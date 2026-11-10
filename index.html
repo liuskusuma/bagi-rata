@@ -377,7 +377,7 @@ const STR = {
     foodOn: "Ada pembagian makanan", food: "Makanan", foodName: "Nama makanan", price: "Harga", each: "Per orang", shared: "Dibagi", addFood: "+ Tambah makanan",
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
-    clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" tetap kamu yang atur di bawah.",
+    clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" kamu yang atur di bawah; teman yang ikut makan bisa menambahkan dirinya.",
     clCreate: "Buat link klaim", clCreating: "Membuat link…", clNeed: "Isi nama orang dan item makanan dulu.",
     clFail: "Gagal terhubung ke server. Cek internet lalu coba lagi.", clNoDb: "Link klaim belum disiapkan di server (database D1 belum dipasang).",
     clShare: "Kirim link ke grup WhatsApp", clCopy: "Salin", clCopied: "Link tersalin",
@@ -385,7 +385,7 @@ const STR = {
     clStatus: (a, b) => `${a}/${b} sudah klaim`, clRefresh: "Perbarui sekarang", clDone: "Sudah", clWait: "Belum klaim", clItems: n => `${n} item`,
     clNoOwner: "Belum ada pemilik", clAllOwned: "Tidak ada, semua sudah ada pemiliknya",
     clRemind: "Ingatkan yang belum klaim", clRemindMsg: (n, u) => `Halo ${n}, jangan lupa klaim makananmu ya 🙏\n${u}`,
-    clNote: "Klaim yang masuk otomatis mencentang nama di item \"Per orang\" (dicek tiap 15 detik). Kamu tetap bisa ubah sendiri. Item tanpa pemilik bisa kamu centangkan atau jadikan \"Dibagi\".",
+    clNote: "Klaim yang masuk otomatis mencentang nama di item \"Per orang\", dan di item \"Dibagi\" kalau teman mencentang \"ikut makan\" (dicek tiap 15 detik). Kamu tetap bisa ubah sendiri. Item tanpa pemilik bisa kamu centangkan atau jadikan \"Dibagi\".",
     clClosed: "Klaim sudah ditutup karena tagihan sudah dikirim.", clStop: "Hapus link klaim", clStopConfirm: "Hapus link klaim dari tagihan ini? Link lama tidak bisa dipakai lagi.",
     payTitle: "Pembayaran", payOf: (a, b) => `${a}/${b} lunas`, payIn: "Sudah masuk", paySent: "Katanya sudah transfer", payPaid: "Lunas", payNone: "Belum bayar",
     payRecv: "Diterima", payCash: "Tandai lunas (tunai)", payUndo: "Batal", payProof: "Lihat bukti",
@@ -428,7 +428,7 @@ const STR = {
     foodOn: "Split food", food: "Food", foodName: "Food name", price: "Price", each: "Each", shared: "Shared", addFood: "+ Add food",
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
-    clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. \"Shared\" items stay yours to set below.",
+    clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. You set \"Shared\" items below; friends who had some can add themselves.",
     clCreate: "Create claim link", clCreating: "Creating link…", clNeed: "Add people and food items first.",
     clFail: "Couldn't reach the server. Check your connection and try again.", clNoDb: "Claim links aren't set up on the server yet (the D1 database isn't connected).",
     clShare: "Send the link to the WhatsApp group", clCopy: "Copy", clCopied: "Link copied",
@@ -436,7 +436,7 @@ const STR = {
     clStatus: (a, b) => `${a}/${b} claimed`, clRefresh: "Refresh now", clDone: "Done", clWait: "Not claimed", clItems: n => n === 1 ? "1 item" : `${n} items`,
     clNoOwner: "No owner yet", clAllOwned: "None, every item has an owner",
     clRemind: "Remind those who haven't claimed", clRemindMsg: (n, u) => `Hi ${n}, don't forget to claim your food 🙏\n${u}`,
-    clNote: "Claims tick names on \"Each\" items automatically (checked every 15 seconds). You can still change them yourself. Tick someone on items with no owner, or make them \"Shared\".",
+    clNote: "Claims tick names on \"Each\" items automatically, and on \"Shared\" items when a friend ticks \"I had some\" (checked every 15 seconds). You can still change them yourself. Tick someone on items with no owner, or make them \"Shared\".",
     clClosed: "Claims are closed because the bill has been sent.", clStop: "Remove claim link", clStopConfirm: "Remove the claim link from this bill? The old link will stop working.",
     payTitle: "Payments", payOf: (a, b) => `${a}/${b} paid`, payIn: "Received", paySent: "Says transferred", payPaid: "Paid", payNone: "Not paid",
     payRecv: "Received", payCash: "Mark paid (cash)", payUndo: "Undo", payProof: "See proof",
@@ -1304,10 +1304,16 @@ function applyClaims() {
   for (const [name, c] of Object.entries(CL.claims || {})) {
     if (ap[name] >= c.updated) continue;
     const p = S.players.find(x => clName(x).toLowerCase() === name.toLowerCase()); if (!p) continue;
-    for (const f of S.foodItems) if (f.mode !== "split") {
+    const joined = (S.claim.joined || (S.claim.joined = {}))[name] || [];
+    for (const f of S.foodItems) {
       const want = c.items.includes(f.id), has = f.who.includes(p.id);
-      if (want && !has) f.who = f.who.concat(p.id); else if (!want && has) f.who = f.who.filter(x => x !== p.id);
+      if (f.mode !== "split") {
+        if (want && !has) f.who = f.who.concat(p.id); else if (!want && has) f.who = f.who.filter(x => x !== p.id);
+      } else if (want && !has) { f.who = f.who.concat(p.id); joined.push(f.id); }
+      // On a shared item a friend can only take back their own "I had some", never a name the payer picked.
+      else if (!want && has && joined.includes(f.id)) { f.who = f.who.filter(x => x !== p.id); joined.splice(joined.indexOf(f.id), 1); }
     }
+    S.claim.joined[name] = [...new Set(joined)];
     ap[name] = c.updated;
   }
 }
