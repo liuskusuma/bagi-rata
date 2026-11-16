@@ -115,8 +115,8 @@ const STR = {
     alsoBy: n => `Juga dipesan ${n}`, sharedGroup: p => `Sharing (diatur ${p})`, splitN: n => `Dibagi ${n} orang`, youIn: "kamu ikut", youOut: "kamu tidak ikut",
     sharedNote: p => `${p} sudah pilih siapa yang ikut. Kalau kamu juga ikut makan, centang item-nya.`, youInSet: p => `kamu ikut (diatur ${p})`, joinHint: "centang kalau kamu ikut makan", noItems: "Belum ada item di nota ini.",
     yourTotal: "Total kamu, sudah service & pajak", review: "Cek", reviewTitle: "Bagianmu", yourItems: "Item kamu", nothing: "Kamu belum centang apa pun.",
-    subtotal: "Subtotal", service: "Service", tax: "Pajak 10%", total: "Total", shared: "Sharing",
-    calcNote: "Service dan pajak dihitung dari subtotal kamu, sama seperti nota.", payTo: "Transfer ke", copy: "Salin", copied: "Tersalin",
+    subtotal: "Subtotal", service: "Service", tax: "Pajak", total: "Total", shared: "Sharing",
+    calcNote: "Service dan pajak dibagi sesuai porsi subtotal kamu, sama seperti di nota.", payTo: "Transfer ke", copy: "Salin", copied: "Tersalin",
     send: "Kirim klaim", sending: "Mengirim…", sendFail: "Gagal mengirim. Cek koneksi lalu coba lagi.",
     doneT: "Klaim terkirim", doneS: p => `${p} sudah bisa melihat item kamu.`, change: "Ubah item", notMe: "Bukan kamu? Ganti nama",
     later: p => `Nanti saat ${p} kirim tagihan akhir, buka link ini lagi untuk bayar.`, seeBill: "Lihat tagihan & bayar",
@@ -135,8 +135,8 @@ const STR = {
     alsoBy: n => `Also ordered by ${n}`, sharedGroup: p => `Shared plates (set by ${p})`, splitN: n => `Split ${n} ways`, youIn: "you're in", youOut: "you're not in",
     sharedNote: p => `${p} has picked who shares these. If you had some too, tick the item.`, youInSet: p => `you're in (set by ${p})`, joinHint: "tick if you had some", noItems: "This bill has no items yet.",
     yourTotal: "Your total, incl. service & tax", review: "Review", reviewTitle: "Your share", yourItems: "Your items", nothing: "You haven't ticked anything.",
-    subtotal: "Subtotal", service: "Service", tax: "Tax 10%", total: "Total", shared: "Shared",
-    calcNote: "Service and tax are worked out on your subtotal, same as the bill.", payTo: "Pay to", copy: "Copy", copied: "Copied",
+    subtotal: "Subtotal", service: "Service", tax: "Tax", total: "Total", shared: "Shared",
+    calcNote: "Service and tax are shared in proportion to your subtotal, same as on the bill.", payTo: "Pay to", copy: "Copy", copied: "Copied",
     send: "Send my claim", sending: "Sending…", sendFail: "Couldn't send. Check your connection and try again.",
     doneT: "Claim sent", doneS: p => `${p} can see your items now.`, change: "Change my items", notMe: "Not you? Change name",
     later: p => `When ${p} sends the final bill, open this link again to pay.`, seeBill: "See the bill and pay",
@@ -167,7 +167,9 @@ const ini = n => esc(String(n).trim().slice(0, 2).toUpperCase());
 const D = () => st.d.data;
 const payer = () => D().payer || (st.lang === "en" ? "The payer" : "Penagih");
 const items = () => (D().items || []).filter(it => it.name || it.price);
-const rate = () => 1 + (+D().svc || 0) / 100 + (D().tax ? .1 : 0);
+// Service and tax as shares of the bill subtotal. Older links only had a "10% tax" flag.
+const svcP = () => +D().svc || 0, taxP = () => D().taxPct !== undefined ? +D().taxPct || 0 : D().tax ? 10 : 0;
+const rate = () => 1 + svcP() / 100 + taxP() / 100;
 const claimOf = n => st.d.claims[n] ? new Set(st.d.claims[n].items) : null;
 // A shared item is split among the people the payer picked plus anyone who ticked "I had some" on this page.
 function sharers(it, ids, n) {
@@ -266,7 +268,7 @@ function render() {
   }
 
   else if (st.view === "review") {
-    const s = subOf(st.draft, me), svc = s * (+D().svc || 0) / 100, tax = D().tax ? s * .1 : 0;
+    const s = subOf(st.draft, me), svc = s * svcP() / 100, tax = s * taxP() / 100;
     const rows = items().filter(it => it.shared ? sharers(it, st.draft, me).includes(me) : st.draft.has(it.id)).map(it => {
       const n = it.shared ? sharers(it, st.draft, me).length : 1;
       return `<div class="row"><span class="nm">${esc(it.name)}${it.shared ? `<small>${t.shared} · 1/${n} × ${rp(it.price)}</small>` : ""}</span><span class="amt">${rp(it.price / n)}</span></div>`;
@@ -275,7 +277,7 @@ function render() {
       <div class="gt">${t.yourItems}</div>
       <div class="card">${rows || `<div class="row"><span class="nm mut">${t.nothing}</span></div>`}
         <div class="row"><span class="nm lbl">${t.subtotal}</span><span class="amt">${rp(s)}</span></div>
-        ${svc ? `<div class="row"><span class="nm">${t.service} ${+D().svc}%</span><span class="amt mut">${rp(svc)}</span></div>` : ""}
+        ${svc ? `<div class="row"><span class="nm">${t.service}</span><span class="amt mut">${rp(svc)}</span></div>` : ""}
         ${tax ? `<div class="row"><span class="nm">${t.tax}</span><span class="amt mut">${rp(tax)}</span></div>` : ""}
         <div class="row"><span class="nm lbl">${t.total}</span><span class="amt big">${rp(s + svc + tax)}</span></div></div>
       <p class="foot">${t.calcNote}</p>
