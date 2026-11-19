@@ -394,7 +394,7 @@ const STR = {
     payeeNote: "Penerima ikut dihitung, tapi tidak masuk pesan.", payeeMode: "Penerima adalah", fromPlayers: "Pemain", otherName: "Lainnya", payeeOtherName: "Nama penerima", payeeOtherNote: "Penerima bukan pemain, jadi tidak ikut dibagi biaya. Semua pemain ditagih penuh.", players: n => `${n} pemain`, name: "Nama", payeeTag: "penerima", addPlayer: "+ Tambah pemain",
     hoursPlayed: "Jam main", hours: h => `${h} jam`, addPartial: "+ Pemain tidak main full", noName: "(tanpa nama)", del: "Hapus", less: "Kurangi", more: "Tambah",
     partialNote: h => `Semua pemain dianggap main penuh ${h} jam. Tambahkan hanya yang tidak full; dianggap main dari awal.`,
-    cost: "Biaya", amount: "Nominal", perHour: "Per jam", equal: "Rata", perHourHint: "Per jam: dibagi sesuai lama main tiap pemain.", equalHint: "Rata: dibagi sama besar ke semua pemain.", allFull: "Semua pemain main penuh, jadi setiap biaya dibagi rata. Pilihan Per jam muncul kalau ada pemain yang tidak main full.", addCost: "+ Tambah biaya", rounding: "Pembulatan per orang", rNone: "Tidak", rUp: "Ke atas 1rb", rDown: "Ke bawah 1rb", newCost: "Lain-lain",
+    cost: "Biaya", amount: "Nominal", perHour: "Per jam", equal: "Rata", perHourHint: "Per jam: dibagi sesuai lama main tiap pemain.", equalHint: "Rata: dibagi sama besar ke semua pemain.", allFull: "Semua pemain main penuh, jadi setiap biaya dibagi rata. Pilihan Per jam muncul kalau ada pemain yang tidak main full.", addCost: "+ Tambah biaya", rounding: "Pembulatan per orang (ke 1rb)", rNone: "Tidak", rNear: "Terdekat", rUp: "Ke atas", rDown: "Ke bawah", newCost: "Lain-lain",
     foodOn: "Ada pembagian makanan", food: "Makanan", foodName: "Nama makanan", price: "Harga", each: "Per orang", shared: "Dibagi", addFood: "+ Tambah makanan",
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
@@ -415,7 +415,7 @@ const STR = {
     payRemind: "Ingatkan yang belum bayar", payRemindMsg: (n, u) => `Halo ${n}, tagihannya sudah aku kirim ya. Kalau sudah transfer, kabari lewat link ini 🙏\n${u}`,
     proofTitle: n => `Bukti transfer ${n}`, proofNone: "Bukti transfer tidak ditemukan.", close: "Tutup", loadingDots: "Memuat…",
     tapName: "Ketuk nama untuk melihat cara hitungnya.", waMsg: "Pesan WhatsApp", send: "Kirim ke WhatsApp", copy: "Salin pesan", copied: "Pesan tersalin", selectFallback: "Teks terpilih, salin manual",
-    perHourShort: "jam", ppl: "org", people: "orang", total: "Total", rounded: { "0": "tidak dibulatkan", "1000": "dibulatkan ke atas", "down1000": "dibulatkan ke bawah" },
+    perHourShort: "jam", ppl: "org", people: "orang", total: "Total", rounded: { "0": "tidak dibulatkan", "near1000": "dibulatkan ke ribuan terdekat", "1000": "dibulatkan ke atas", "down1000": "dibulatkan ke bawah" },
     billing: n => `Ditagih ${n} orang`, language: "Bahasa", theme: "Tema", themeNote: "Pilih warna polos, atau lapangan Grand Slam dengan tekstur. Peach dan Sky adalah tema terang.",
     surf: { grass: "Rumput", clay: "Tanah liat", hard: "Hard court", cf: "Navy, aksen kuning" }, k: "rb",
     days: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
@@ -445,7 +445,7 @@ const STR = {
     payeeNote: "The payee is included in the split but left out of the message.", payeeMode: "Payee is", fromPlayers: "A player", otherName: "Other", payeeOtherName: "Payee name", payeeOtherNote: "The payee is not a player, so they are left out of the split. Every player is billed in full.", players: n => `${n} players`, name: "Name", payeeTag: "payee", addPlayer: "+ Add player",
     hoursPlayed: "Hours played", hours: h => `${h} h`, addPartial: "+ Player who left early", noName: "(no name)", del: "Delete", less: "Less", more: "More",
     partialNote: h => `Everyone is counted for the full ${h} hours. Add only players who left early; they are counted from the start.`,
-    cost: "Cost", amount: "Amount", perHour: "Per hour", equal: "Equal", perHourHint: "Per hour: split by how long each player played.", equalHint: "Equal: split evenly among all players.", allFull: "Everyone played the full session, so every cost is split evenly. Per hour shows up when someone left early.", addCost: "+ Add cost", rounding: "Rounding per person", rNone: "None", rUp: "Up to 1k", rDown: "Down to 1k", newCost: "Other",
+    cost: "Cost", amount: "Amount", perHour: "Per hour", equal: "Equal", perHourHint: "Per hour: split by how long each player played.", equalHint: "Equal: split evenly among all players.", allFull: "Everyone played the full session, so every cost is split evenly. Per hour shows up when someone left early.", addCost: "+ Add cost", rounding: "Rounding per person (to 1k)", rNone: "None", rNear: "Nearest", rUp: "Up", rDown: "Down", newCost: "Other",
     foodOn: "Split food", food: "Food", foodName: "Food name", price: "Price", each: "Each", shared: "Shared", addFood: "+ Add food",
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
@@ -466,7 +466,7 @@ const STR = {
     payRemind: "Remind those who haven't paid", payRemindMsg: (n, u) => `Hi ${n}, I've sent the bill. When you've transferred, let me know through this link 🙏\n${u}`,
     proofTitle: n => `Transfer proof from ${n}`, proofNone: "No transfer proof found.", close: "Close", loadingDots: "Loading…",
     tapName: "Tap a name to see how it was calculated.", waMsg: "WhatsApp message", send: "Send to WhatsApp", copy: "Copy message", copied: "Message copied", selectFallback: "Text selected, copy it manually",
-    perHourShort: "h", ppl: "ppl", people: "people", total: "Total", rounded: { "0": "not rounded", "1000": "rounded up", "down1000": "rounded down" },
+    perHourShort: "h", ppl: "ppl", people: "people", total: "Total", rounded: { "0": "not rounded", "near1000": "rounded to the nearest thousand", "1000": "rounded up", "down1000": "rounded down" },
     billing: n => `Billing ${n} people`, language: "Language", theme: "Theme", themeNote: "Pick a plain color, or a Grand Slam court with its texture. Peach and Sky are light themes.",
     surf: { grass: "Grass", clay: "Clay", hard: "Hard court", cf: "Navy, yellow accent" }, k: "k",
     days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
@@ -604,7 +604,7 @@ const sportCosts = (k = sport(), id = (P?.lang || "en") === "id") => [
 const TENNIS_SAMPLE = (id = (P?.lang || "en") === "id") => ({
   title: "", vs: "", date: "", venue: "",
   courts: [{ id: "k1", name: id ? "Lapangan 1" : "Court 1", start: "", hours: 2 }],
-  bankName: "", bankNo: "", bankHolder: "", round: "1000",
+  bankName: "", bankNo: "", bankHolder: "", round: "near1000", roundV2: 1,
   costs: sportCosts(sport(), id),
   players: [],
   partial: [],
@@ -616,7 +616,7 @@ const TENNIS_SAMPLE = (id = (P?.lang || "en") === "id") => ({
 // Split Bill: no opponent, courts, hours or tennis costs. Food items are the bill; costs hold the "other costs" split evenly.
 const SPLIT_SAMPLE = () => ({
   title: "", vs: "", date: "", venue: "", courts: [],
-  bankName: "", bankNo: "", bankHolder: "", round: "1000", payer: "",
+  bankName: "", bankNo: "", bankHolder: "", round: "near1000", roundV2: 1, payer: "",
   costs: [], players: [], partial: [],
   foodOn: true, foodItems: [], foodSvcAmt: 0, foodTaxAmt: 0
 });
@@ -640,6 +640,8 @@ function loadS() {
   try { d = JSON.parse(isSplit() ? localStorage.getItem(KEY_SPLIT) || "null" : localStorage.getItem(KEY) || OLD_KEYS.map(k => localStorage.getItem(k)).find(Boolean) || "null"); } catch (e) {}
   d = d || SAMPLE();
   migrateSvc(d);
+  // Nearest thousand became the default; sessions saved with the old default (round up) switch over once.
+  if (!d.roundV2) { if (d.round === "1000" || !d.round) d.round = "near1000"; d.roundV2 = 1; }
   if (isSplit()) { d.foodOn = true; d.courts = []; d.vs = ""; d.partial = []; d.payer = d.payer || ""; }
   return d;
 }
@@ -774,7 +776,7 @@ function compute() {
   for (const r of rows) {
     r.raw = Object.values(r.parts).reduce((a, b) => a + b, 0) + r.food;
     const raw = Math.round(r.raw);
-    r.final = S.round === "1000" ? Math.ceil(raw / 1000) * 1000 : S.round === "down1000" ? Math.floor(raw / 1000) * 1000 : raw;
+    r.final = S.round === "near1000" ? Math.round(raw / 1000) * 1000 : S.round === "1000" ? Math.ceil(raw / 1000) * 1000 : S.round === "down1000" ? Math.floor(raw / 1000) * 1000 : raw;
   }
   const allShares = rows.reduce((a, r) => a + r.final, 0);
   const collected = rows.reduce((a, r) => a + (r.p.id === PID() ? 0 : r.final), 0);
@@ -945,7 +947,7 @@ function viewBiaya(T) {
     </div>${choose ? `<p class="foot">${c.split === "hours" ? T.perHourHint : T.equalHint}</p>` : ""}`).join("") + `
     <div class="group" style="margin-top:18px"><div class="row"><button type="button" class="addrow" id="add-cost">${T.addCost}</button></div></div>
     <div class="group-title">${T.rounding}</div>
-    <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>`;
+    <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["near1000", T.rNear], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>`;
 }
 
 function foodSums(T) {
@@ -1024,7 +1026,7 @@ function viewTagihan(T) {
       <div class="row"><span class="lbl">${T.billed}</span><span class="val">${rp(res.collected)}</span></div>
     </div>
     ${isSplit() ? `<div class="group-title">${T.rounding}</div>
-    <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>` : ""}
+    <div class="group"><div class="row">${seg('data-s="round"', S.round, [["0", T.rNone], ["near1000", T.rNear], ["1000", T.rUp], ["down1000", T.rDown]])}</div></div>` : ""}
     <div class="group-title">${T.perPlayer}</div>
     <div class="group">
       ${res.rows.map(r => `<button type="button" class="row person" data-open="${r.p.id}" aria-expanded="${open === r.p.id}">
