@@ -334,6 +334,11 @@ a.addrow { display: block; text-decoration: none; }
 [data-skin] .tabs button[aria-current="page"] { background: var(--well); box-shadow: var(--inset-sm); border-radius: 16px; margin: 0 4px; font-weight: 700; }
 [data-skin] .theme { box-shadow: var(--raised-sm); border-radius: 24px; }
 [data-skin] .theme[aria-pressed="true"] { box-shadow: var(--inset-sm), 0 0 0 2px var(--accent); }
+/* Scroll bar on the right: shows the page continues below and where you are. Only when the page is taller than the screen. */
+.content { scrollbar-width: none; }
+.content::-webkit-scrollbar { display: none; }
+.sbar { position: absolute; right: 4px; width: 4px; border-radius: 4px; background: color-mix(in srgb, var(--accent) 16%, transparent); z-index: 6; pointer-events: none; }
+.sbar i { position: absolute; left: 0; right: 0; top: 0; border-radius: 4px; background: var(--accent); opacity: .85; will-change: transform; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 /* Mascot sprites and small celebrations. Sprites are horizontal strips of square frames in mascot/; every motion here
    stops when the phone asks for reduced motion. */
@@ -407,6 +412,7 @@ a.addrow { display: block; text-decoration: none; }
         </div>
       </div>
       <div class="content" id="content"></div>
+      <div class="sbar" id="sbar" aria-hidden="true" hidden><i></i></div>
       <button class="summary" id="summary" type="button"></button>
       <nav class="stepbar" id="tabs"></nav>
       <div class="toast" id="toast" hidden></div>
@@ -1541,6 +1547,7 @@ const MASCOT = (m, w, cls = "") => `<span class="mascot m-${m} ${cls}" style="--
 const flashNames = new Set(), billFx = { on: false };
 let fxPrev = null, knownFood = null;
 function afterRender() {
+  sbar();
   const prev = fxPrev; fxPrev = tab;
   if (tab === "bill" && billFx.on) billIntro();
   // Food items added since the last look slide in (scanned ones one after another).
@@ -1590,6 +1597,33 @@ function billIntro() {
   countUp(hero, +hero.dataset.v, 900, rp);
   // Only the total counts up; each person's amount shows straight away. The mascot cheers when the total lands.
   setTimeout(() => { if (!mascot || !mascot.isConnected) return; mascot.className = "mascot m-cheer"; setTimeout(() => { if (mascot.isConnected) mascot.className = "mascot m-breath"; }, 2600); }, 900);
+}
+
+// ---------- Scroll bar: thumb length = how much of the page fits, position = where you are ----------
+// A function declaration so render() can call it before this part of the script has run.
+var sbarRaf = 0, sbarOn = false;
+function sbar() {
+  const c = $("content");
+  if (c && !sbarOn) {
+    sbarOn = true;
+    c.addEventListener("scroll", sbar, { passive: true });
+    addEventListener("resize", sbar);
+    if (window.ResizeObserver) new ResizeObserver(sbar).observe(c);
+    new MutationObserver(sbar).observe(c, { childList: true, subtree: true, attributes: true, characterData: true });
+  }
+  if (!sbarRaf) sbarRaf = requestAnimationFrame(sbarDraw);
+}
+function sbarDraw() {
+  sbarRaf = 0;
+  const c = $("content"), bar = $("sbar"), scr = c && c.closest(".screen");
+  if (!c || !bar || !scr) return;
+  const max = c.scrollHeight - c.clientHeight;
+  bar.hidden = max < 8;
+  if (bar.hidden) return;
+  const cr = c.getBoundingClientRect(), sr = scr.getBoundingClientRect(), h = cr.height - 16;
+  bar.style.top = (cr.top - sr.top + 8) + "px"; bar.style.height = h + "px";
+  const t = bar.firstElementChild, th = Math.max(32, h * c.clientHeight / c.scrollHeight);
+  t.style.height = th + "px"; t.style.transform = `translateY(${(h - th) * Math.min(1, c.scrollTop / max)}px)`;
 }
 
 // ---------- Bill photo: read food items and prices on the phone (Tesseract.js OCR) ----------
