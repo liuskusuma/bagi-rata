@@ -335,6 +335,48 @@ a.addrow { display: block; text-decoration: none; }
 [data-skin] .theme { box-shadow: var(--raised-sm); border-radius: 24px; }
 [data-skin] .theme[aria-pressed="true"] { box-shadow: var(--inset-sm), 0 0 0 2px var(--accent); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* Mascot sprites and small celebrations. Sprites are horizontal strips of square frames in mascot/; every motion here
+   stops when the phone asks for reduced motion. */
+.mascot { display: block; width: var(--w); height: var(--w); flex: 0 0 auto; background-repeat: no-repeat; background-size: auto 100%;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,.9)); animation: spr var(--d) steps(var(--n)) infinite; }
+@keyframes spr { to { background-position-x: calc(var(--n) * var(--w) * -1); } }
+.m-wave { background-image: url(mascot/waving.webp); --n: 4; --d: .8s; }
+.m-think { background-image: url(mascot/thinking.webp); --n: 4; --d: 2.4s; }
+.m-bounce { background-image: url(mascot/bounce.webp); --n: 6; --d: 1s; }
+.m-cheer { background-image: url(mascot/cheering.webp); --n: 4; --d: 1s; }
+.m-point { background-image: url(mascot/pointing.webp); --n: 3; --d: .9s; }
+.m-breath { background-image: url(mascot/breathing.webp); --n: 4; --d: 2s; }
+.kind-mascot { margin: 10px auto -10px; }
+.prog-box { text-align: center; }
+.prog-box .mascot { margin: 0 auto 4px; }
+.bill-hero { display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; margin-top: 6px; }
+.bill-hero small { display: block; font-size: 13px; color: var(--muted); }
+.bill-hero b { display: block; font-family: var(--f-display); font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent-text, var(--accent)); }
+.all-paid { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 0 2px; font-family: var(--f-display); font-weight: 800; font-size: 19px; color: #2fbf71; }
+.mini-ball { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: middle; animation: mball .55s infinite; }
+@keyframes mball { 0%,100% { transform: translateY(-5px); animation-timing-function: cubic-bezier(.45,0,.95,.5); } 50% { transform: translateY(3px) scale(1.15,.85); animation-timing-function: cubic-bezier(.05,.5,.55,1); } }
+.pop-in { animation: popin .42s cubic-bezier(.2,.8,.3,1.15) both; }
+@keyframes popin { from { opacity: 0; transform: translateX(26px); } }
+.flash { animation: flashg 1.8s ease; }
+@keyframes flashg { 0%, 45% { background: color-mix(in srgb, #2fbf71 32%, transparent); } 100% { background: transparent; } }
+.btn, .addrow, .chip, .kind, .link, .summary { transition: transform .12s; }
+.btn:active, .addrow:active:not(:disabled), .chip:active, .kind:active, .summary:active { transform: scale(.96); }
+.celebrate { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(4,8,20,.82); color: #fff; text-align: center; padding: 24px; animation: fadein .2s; }
+.celebrate h3 { font-family: var(--f-display); font-style: italic; font-weight: 800; font-size: 24px; margin: 0; }
+.celebrate p { margin: 0; font-size: 14px; opacity: .8; }
+.celebrate svg { width: 96px; height: 96px; }
+.celebrate circle { fill: none; stroke: #25d366; stroke-width: 6; stroke-dasharray: 283; stroke-dashoffset: 283; transform: rotate(-90deg); transform-origin: center; animation: draw .55s ease-out forwards; }
+.celebrate path { fill: none; stroke: #25d366; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 70; stroke-dashoffset: 70; animation: draw .35s .45s ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fadein { from { opacity: 0; } }
+.conf { position: absolute; width: 8px; height: 12px; border-radius: 2px; z-index: 7; pointer-events: none; }
+.coin { position: absolute; z-index: 7; width: 18px; height: 18px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle at 35% 30%, #ffe9a3, #fbc02d 55%, #d99a00); box-shadow: inset 0 0 0 2px #e8a900, 0 2px 5px rgba(0,0,0,.35); }
+@media (prefers-reduced-motion: reduce) {
+  .mascot { animation: none; }
+  .mini-ball, .pop-in, .flash, .celebrate, .celebrate circle, .celebrate path { animation: none; }
+  .celebrate circle, .celebrate path { stroke-dashoffset: 0; }
+  .btn, .addrow, .chip, .kind, .link, .summary { transition: none; }
+}
 </style>
 
 </head>
@@ -399,7 +441,7 @@ const STR = {
     foodNote: "Ketuk nama untuk memilih siapa yang ditagih. Per orang: tiap orang bayar harga penuh. Dibagi: harga dibagi rata ke orang yang dipilih.", foodOff: "Makanan tidak dimasukkan ke tagihan.",
     summary: "Ringkasan", exact: "Pas", over: "Lebih", short: "Kurang", totalCost: "Total biaya", billed: "Ditagih lewat pesan", payeeShare: "Bagian penerima", perPlayer: "Per pemain",
     clTitle: "Klaim lewat link", clIntro: "Biar tiap orang centang sendiri yang dia pesan lewat link, tanpa install. Item \"Dibagi\" kamu yang atur di bawah; teman yang ikut makan bisa menambahkan dirinya.",
-    clCreate: "Buat link klaim", clCreating: "Membuat link…", clNeed: "Isi nama orang dan item makanan dulu.",
+    clCreate: "Buat link klaim", clCreating: "Membuat link…", sentWa: "Tagihan terkirim!", sentWaSub: "Pesannya sudah dibuka di WhatsApp.", allPaid: "Semua lunas!", clNew: n => `${n} baru klaim`, clNeed: "Isi nama orang dan item makanan dulu.",
     clFail: "Gagal terhubung ke server. Cek internet lalu coba lagi.", clNoDb: "Link klaim belum disiapkan di server (database D1 belum dipasang).",
     clShare: "Kirim link ke grup WhatsApp", clCopy: "Salin", clCopied: "Link tersalin",
     clMsg: (u, t) => `🍽️ ${t || "Nota makanan"}\n\nKlik link, pilih nama, centang yang kamu pesan ya. Yang sharing sudah aku atur.\n${u}`,
@@ -450,7 +492,7 @@ const STR = {
     foodNote: "Tap names to choose who pays. Each: every person pays the full price. Shared: the price is split among the people chosen.", foodOff: "Food is not included in the bills.",
     summary: "Summary", exact: "Exact", over: "Over", short: "Short", totalCost: "Total costs", billed: "Billed in message", payeeShare: "Payee's share", perPlayer: "Per player",
     clTitle: "Claim by link", clIntro: "Let everyone tick what they ordered through a link, no install needed. You set \"Shared\" items below; friends who had some can add themselves.",
-    clCreate: "Create claim link", clCreating: "Creating link…", clNeed: "Add people and food items first.",
+    clCreate: "Create claim link", clCreating: "Creating link…", sentWa: "Bill sent!", sentWaSub: "The message is open in WhatsApp.", allPaid: "Everyone has paid!", clNew: n => `${n} just claimed`, clNeed: "Add people and food items first.",
     clFail: "Couldn't reach the server. Check your connection and try again.", clNoDb: "Claim links aren't set up on the server yet (the D1 database isn't connected).",
     clShare: "Send the link to the WhatsApp group", clCopy: "Copy", clCopied: "Link copied",
     clMsg: (u, t) => `🍽️ ${t || "Food bill"}\n\nTap the link, pick your name and tick what you ordered. I've already sorted the shared plates.\n${u}`,
@@ -970,8 +1012,8 @@ function viewMakanan(T) {
     ${isSplit() ? "" : `<div class="group" style="margin-top:6px"><div class="row"><span class="lbl ask">${T.foodAsk}</span>
       <button type="button" class="switch" role="switch" id="food-switch" aria-checked="${!!S.foodOn}" aria-label="${T.foodAsk}"></button></div></div>`}
     ${S.foodOn ? `<button type="button" class="btn btn-scan" id="scan-bill"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>${T.scan}</button>` + viewClaim(T) + S.foodItems.map(f => `
-      <div class="group-title"><span>${esc(f.name || T.food)}</span><button type="button" class="danger" data-del-food="${f.id}" aria-label="${T.del} ${esc(f.name || T.food)}">${TRASH}</button></div>
-      <div class="group">
+      <div class="group-title" data-fid="${f.id}"><span>${esc(f.name || T.food)}</span><button type="button" class="danger" data-del-food="${f.id}" aria-label="${T.del} ${esc(f.name || T.food)}">${TRASH}</button></div>
+      <div class="group" data-fid="${f.id}">
         <div class="row"><label>${T.name}</label><input aria-label="${T.foodName}" data-col="foodItems" data-id="${f.id}" data-k="name" value="${esc(f.name)}" placeholder="${T.foodName}"></div>
         <div class="row"><label>${T.price}</label><span class="rp">Rp</span><input aria-label="${T.price}" class="money" inputmode="numeric" data-col="foodItems" data-id="${f.id}" data-k="price" value="${money(f.price)}" placeholder="0"></div>
         <div class="row">${seg(`data-col="foodItems" data-id="${f.id}" data-k="mode"`, f.mode, [["each", T.each], ["split", T.shared]])}</div>
@@ -1019,9 +1061,11 @@ function explainHtml(T, res, r) {
 
 function viewTagihan(T) {
   rememberNames();
+  billFx.on = fxPrev !== "bill" && !RM();
   const res = compute(), msg = buildMessage(res), diff = res.allShares - res.costTotal;
   const pill = Math.abs(diff) < 1 ? `<span class="pill ok">${T.exact}</span>` : diff > 0 ? `<span class="pill ok">${T.over} ${rb(diff)}</span>` : `<span class="pill warn">${T.short} ${rb(-diff)}</span>`;
   return `
+    <div class="group bill-hero">${MASCOT(billFx.on ? "point" : "breath", 64)}<div><small>${T.billed}</small><b id="bill-hero" data-v="${res.collected}">${rp(res.collected)}</b></div></div>
     <div class="group-title">${T.summary} ${pill}</div>
     <div class="group">
       <div class="row"><span class="lbl">${T.totalCost}</span><span class="val">${rp(res.costTotal)}</span></div>
@@ -1033,7 +1077,7 @@ function viewTagihan(T) {
     <div class="group">
       ${res.rows.map(r => `<button type="button" class="row person" data-open="${r.p.id}" aria-expanded="${open === r.p.id}">
           <span class="name">${pname(r.p)}${r.p.id === PID() ? `<span class="tag">${T.payeeTag}</span>` : ""}</span>
-          <span class="amt">${rb(r.final)}</span><span class="chev">›</span></button>
+          <span class="amt" data-v="${r.final}">${rb(r.final)}</span><span class="chev">›</span></button>
         ${open === r.p.id ? `<div class="explain">${explainHtml(T, res, r)}</div>` : ""}`).join("")}
     </div>
     <p class="foot">${T.tapName}</p>
@@ -1059,7 +1103,7 @@ function viewKind(T) {
     ${P.offerGuided ? `<div class="kind-head"><h3>${T.offerTitle}</h3><p>${T.offerText}</p></div>
     <div class="offer"><button type="button" class="btn offer-yes" data-offer="guided">${T.offerYes}</button><button type="button" class="btn offer-no" data-offer="tabs">${T.offerNo}</button></div>
     <p class="foot">${T.offerNote}</p>` : ""}
-    <div class="kind-head"><h3>${T.kindAsk}</h3><p>${T.kindIntro}</p></div>
+    ${MASCOT("wave", 128, "kind-mascot")}<div class="kind-head"><h3>${T.kindAsk}</h3><p>${T.kindIntro}</p></div>
     <div class="kinds">${["tennis", "split"].map(k => `
       <button type="button" class="kind" data-kind="${k}" aria-pressed="${(P.kind || "tennis") === k}">
         <span class="ic">${KIND_ICON[k === "tennis" ? sport() : k]}</span><span class="tx"><b>${T[k]}${k === "tennis" ? ` <em class="sport-now">· ${sportName()}</em>` : ""}</b><small>${T[k + "Desc"]}</small></span><span class="chev" aria-hidden="true">›</span>
@@ -1141,6 +1185,7 @@ function render(keepScroll) {
   $("progress").innerHTML = steps().map((k, j) => `<button type="button" data-tab="${k}" class="${j <= i ? "done" : ""}" aria-label="${T.tabs[k]}"${k === tab ? ' aria-current="step"' : ""}></button>`).join("");
   content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
+  afterRender();
   $("tabs").innerHTML = i < 0 ? `<button type="button" class="next" data-tab="${back}">${T.done}</button>`
     : (i > 0 ? `<button type="button" class="prev" data-tab="${steps()[i - 1]}">‹ ${T.back}</button>` : "")
       + (i < steps().length - 1 ? `<button type="button" class="next" data-tab="${steps()[i + 1]}">${T.next(T.tabs[steps()[i + 1]])} ›</button>`
@@ -1155,6 +1200,7 @@ function renderTabs(keepScroll) {
   $("progress").hidden = true;
   content.innerHTML = VIEWS[tab](T) + clearBtn(T);
   content.scrollTop = keepScroll ? top : 0;
+  afterRender();
   $("tabs").className = "tabs";
   $("tabs").style.gridTemplateColumns = `repeat(${tabsList().length}, 1fr)`;
   $("tabs").innerHTML = tabsList().map(k => `<button type="button" data-tab="${k}"${k === tab ? ' aria-current="page"' : ""}>${TAB_ICON[k]}<span>${T.tabs[k]}</span></button>`).join("");
@@ -1393,7 +1439,9 @@ function applyClaims() {
       else if (!want && has && joined.includes(f.id)) { f.who = f.who.filter(x => x !== p.id); joined.splice(joined.indexOf(f.id), 1); }
     }
     S.claim.joined[name] = [...new Set(joined)];
+    toast(L().clNew(clName(p)));
     ap[name] = c.updated;
+    flashNames.add(name.toLowerCase());
   }
 }
 // Sending (or copying) the bill message closes claims and opens payments on the friends' page.
@@ -1404,7 +1452,7 @@ function viewClaim(T) {
     const off = clBusy || !named.length || !items.length;
     return `<div class="group-title"><span>${T.clTitle}</span></div>
       <div class="group"><div class="row"><span class="cl-intro">${esc(T.clIntro)}</span></div>
-        <div class="row"><button type="button" class="addrow" id="claim-create"${off ? " disabled" : ""}>${clBusy ? T.clCreating : T.clCreate}</button></div></div>
+        <div class="row"><button type="button" class="addrow" id="claim-create"${off ? " disabled" : ""}>${clBusy ? `<span class="mini-ball" aria-hidden="true"></span>${T.clCreating}` : T.clCreate}</button></div></div>
       ${!named.length || !items.length ? `<p class="foot">${T.clNeed}</p>` : ""}${clErr ? `<p class="foot">${esc(clErr)}</p>` : ""}`;
   }
   const url = claimUrl(), claims = (CL && CL.claims) || {};
@@ -1416,7 +1464,7 @@ function viewClaim(T) {
       <div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.clMsg(url, S.title))}" target="_blank" rel="noopener">${T.clShare}</a></div>
     </div>
     <div class="group" style="margin-top:12px">
-      ${named.map(p => { const c = claims[clName(p)]; return `<div class="row"><span class="lbl" style="flex:1 1 auto">${pname(p)}</span>${c ? `<span class="val">${T.clItems(c.items.length)}</span> <span class="pill ok">${T.clDone}</span>` : `<span class="pill warn">${T.clWait}</span>`}</div>`; }).join("")}
+      ${named.map(p => { const c = claims[clName(p)]; return `<div class="row${flashNames.has(clName(p).toLowerCase()) ? " flash" : ""}"><span class="lbl" style="flex:1 1 auto">${pname(p)}</span>${c ? `<span class="val">${T.clItems(c.items.length)}</span> <span class="pill ok">${T.clDone}</span>` : `<span class="pill warn">${T.clWait}</span>`}</div>`; }).join("")}
       <div class="row"><span class="lbl">${T.clNoOwner}</span><span class="val" style="white-space:normal;text-align:right">${noOwner.length ? esc(noOwner.map(f => f.name || T.food).join(", ")) : T.clAllOwned}</span></div>
       ${waiting.length && !(CL && CL.closed) ? `<div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.clRemindMsg(waiting.join(", "), url))}" target="_blank" rel="noopener">${T.clRemind}</a></div>` : ""}
       <div class="row"><button type="button" class="addrow" id="claim-refresh">${T.clRefresh}</button></div>
@@ -1442,6 +1490,7 @@ function viewPays(T, res) {
           : `<button type="button" class="chip" data-pay-ok="${esc(n)}">${T.payCash}</button>`;
         return `<div class="row"><span class="lbl" style="flex:1 1 auto">${pname(r.p)}<span class="pay-amt">${rb(r.final)}</span></span>${pill}</div><div class="chips pay-acts">${acts}</div>`;
       }).join("")}
+      ${rows.length && paid.length === rows.length ? `<div class="all-paid">${MASCOT("cheer", 64)}${T.allPaid}</div>` : ""}
       ${waiting.length ? `<div class="row"><a class="addrow" href="https://wa.me/?text=${encodeURIComponent(T.payRemindMsg(waiting.join(", "), claimUrl()))}" target="_blank" rel="noopener">${T.payRemind}</a></div>` : ""}
     </div>
     <p class="foot">${T.payNote}${clErr ? " " + esc(clErr) : ""}</p>`;
@@ -1482,9 +1531,77 @@ function claimClick(b, T) {
   if (d.payProof !== undefined) { showProof(d.payProof); return true; }
   return false;
 }
-$("content").addEventListener("click", e => { if (e.target.closest("#send-wa")) claimSent(); });
+$("content").addEventListener("click", e => { if (e.target.closest("#send-wa")) { claimSent(); celebrate(); } });
 setInterval(() => { if (S.claim && document.visibilityState === "visible" && ["food", "bill"].includes(tab)) claimSync(true); }, 15000);
 document.addEventListener("visibilitychange", () => { if (S.claim && document.visibilityState === "visible") claimSync(true); });
+
+
+// ---------- Mascot and small animations ----------
+const RM = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MASCOT = (m, w, cls = "") => `<span class="mascot m-${m} ${cls}" style="--w:${w}px" aria-hidden="true"></span>`;
+const flashNames = new Set(), billFx = { on: false };
+let fxPrev = null, knownFood = null;
+function afterRender() {
+  const prev = fxPrev; fxPrev = tab;
+  if (tab === "bill" && billFx.on) billIntro();
+  // Food items added since the last look slide in (scanned ones one after another).
+  const ids = S.foodItems.map(f => f.id);
+  if (knownFood && tab === "food" && !RM()) ids.filter(id => !knownFood.has(id)).forEach((id, n) =>
+    document.querySelectorAll(`#content [data-fid="${id}"]`).forEach(el => { el.classList.add("pop-in"); el.style.animationDelay = `${n * 90}ms`; }));
+  knownFood = new Set(ids);
+  flashNames.clear();
+  // Confetti once when the last friend is marked paid.
+  if (S.claim) {
+    const all = !!document.querySelector("#content .all-paid");
+    if (all && !S.claim.cheered && prev === "bill") { S.claim.cheered = true; save(); const el = document.querySelector("#content .all-paid"); const r = spot(el); confetti(r.x, r.y, 40); }
+    else if (all && !S.claim.cheered) { S.claim.cheered = true; save(); }
+    else if (!all && S.claim.cheered && tab === "bill") S.claim.cheered = false;
+  }
+}
+const screenEl = () => document.querySelector(".screen");
+function spot(el) { const a = el.getBoundingClientRect(), b = screenEl().getBoundingClientRect(); return { x: a.left - b.left + a.width / 2, y: a.top - b.top + a.height / 2 }; }
+function confetti(x, y, n) {
+  if (RM()) return;
+  const C = ["#fbc02d", "#7fd6a4", "#6ab4ff", "#ff8a80", "#ffffff", "#25d366"], host = screenEl();
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement("span"); c.className = "conf";
+    c.style.left = x + "px"; c.style.top = y + "px"; c.style.background = C[i % C.length];
+    if (i % 3 === 0) { c.style.borderRadius = "50%"; c.style.width = c.style.height = "8px"; }
+    host.appendChild(c);
+    const a = Math.random() * Math.PI * 2, sp = 60 + Math.random() * 110, dx = Math.cos(a) * sp, dy = Math.sin(a) * sp - 70, r = Math.random() * 720 - 360;
+    c.animate([{ transform: "translate(-50%,-50%) rotate(0)", opacity: 1 }, { transform: `translate(${dx}px,${dy}px) rotate(${r / 2}deg)`, opacity: 1, offset: .35 },
+      { transform: `translate(${dx * 1.25}px,${dy + 300}px) rotate(${r}deg)`, opacity: 0 }], { duration: 1500 + Math.random() * 700, easing: "cubic-bezier(.2,.6,.4,1)" }).onfinish = () => c.remove();
+  }
+}
+// After "Send to WhatsApp": a check mark and confetti, shown when the person comes back from WhatsApp.
+function celebrate() {
+  const T = L(), host = screenEl(), old = host.querySelector(".celebrate"); if (old) old.remove();
+  const el = document.createElement("div"); el.className = "celebrate"; el.setAttribute("role", "status");
+  el.innerHTML = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45"/><path d="M30 52l13 13 27-29"/></svg><h3>${T.sentWa}</h3><p>${T.sentWaSub}</p>`;
+  host.appendChild(el);
+  const close = () => el.remove(); el.onclick = close; setTimeout(close, RM() ? 1600 : 2600);
+  if (!RM()) setTimeout(() => { const r = spot(el.querySelector("svg")); confetti(r.x, r.y, 46); }, 750);
+}
+// Opening the bill page: one coin splits and flies to every name, each amount counts up from 0, then the mascot cheers.
+function countUp(el, to, dur, fmt) { const t0 = performance.now(); (function f(t) { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(to * e); if (p < 1) requestAnimationFrame(f); else el.textContent = fmt(to); })(t0); }
+function billIntro() {
+  billFx.on = false;
+  const hero = $("bill-hero"), amts = [...document.querySelectorAll("#content .person .amt")], mascot = document.querySelector("#content .bill-hero .mascot");
+  if (!hero) return;
+  countUp(hero, +hero.dataset.v, 900, rp);
+  amts.forEach(a => a.textContent = rb(0));
+  const o = spot(hero), host = screenEl(); let left = amts.length;
+  const done = () => { if (!mascot) return; mascot.className = "mascot m-cheer"; setTimeout(() => { if (mascot.isConnected) mascot.className = "mascot m-breath"; }, 2600); };
+  if (!left) return done();
+  amts.forEach((a, i) => {
+    const t = spot(a), c = document.createElement("span"); c.className = "coin"; c.style.left = (o.x - 9) + "px"; c.style.top = (o.y - 9) + "px"; host.appendChild(c);
+    const dx = t.x - o.x, dy = t.y - o.y, mx = dx * .5 + (i % 2 ? -36 : 36), my = Math.min(dy * .4, dy - 50) - 30;
+    c.animate([{ transform: "translate(0,0) scale(.4)" }, { transform: `translate(${mx}px,${my}px) scale(1.1) rotate(200deg)`, offset: .45 }, { transform: `translate(${dx}px,${dy}px) scale(.8) rotate(400deg)` }],
+      { duration: 650, delay: 250 + i * 80, easing: "cubic-bezier(.4,0,.3,1)", fill: "backwards" }).onfinish = () => {
+      c.remove(); if (a.isConnected) countUp(a, +a.dataset.v, 550, rb); if (!--left) done();
+    };
+  });
+}
 
 // ---------- Bill photo: read food items and prices on the phone (Tesseract.js OCR) ----------
 // The installed app serves the reader from its own vendor/ folder (cached for offline use); the mockup page uses the CDN.
@@ -1496,7 +1613,12 @@ const abs = u => new URL(u, location.href).href;
 const loadScript = src => new Promise((ok, fail) => { if (window.Tesseract) return ok(); const el = document.createElement("script"); el.src = src; el.onload = ok; el.onerror = fail; document.head.appendChild(el); });
 let scan = null;
 function sheet(html) { $("sheet-body").innerHTML = html; $("sheet").hidden = !html; }
-function sheetProgress(text, pct) { sheet(`<h3>${esc(text)}</h3><div class="bar"><span style="width:${Math.round(pct * 100)}%"></span></div>`); }
+// Progress updates in place, so the mascot keeps moving: it bounces while the reader loads and thinks while it reads.
+function sheetProgress(text, pct) {
+  const m = text === L().scanLoading ? "bounce" : "think", box = $("sheet-body").querySelector(".prog-box"), w = `${Math.round(pct * 100)}%`;
+  if (box && box.dataset.m === m && !$("sheet").hidden) { box.querySelector("h3").textContent = text; box.querySelector(".bar span").style.width = w; return; }
+  sheet(`<div class="prog-box" data-m="${m}">${MASCOT(m, 110)}<h3>${esc(text)}</h3><div class="bar"><span style="width:${w}"></span></div></div>`);
+}
 // Bills read best around 1800px wide: small (chat-compressed) photos are enlarged, big ones reduced.
 // The photo is cropped to the paper (the bright part), turned grey and contrast-stretched; mode "bin" also applies
 // a local-mean threshold, which removes shadows and folds but can eat thin digits on blurry photos.
