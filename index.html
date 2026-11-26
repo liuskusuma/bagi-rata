@@ -370,7 +370,6 @@ a.addrow { display: block; text-decoration: none; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @keyframes fadein { from { opacity: 0; } }
 .conf { position: absolute; width: 8px; height: 12px; border-radius: 2px; z-index: 7; pointer-events: none; }
-.coin { position: absolute; z-index: 7; width: 18px; height: 18px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle at 35% 30%, #ffe9a3, #fbc02d 55%, #d99a00); box-shadow: inset 0 0 0 2px #e8a900, 0 2px 5px rgba(0,0,0,.35); }
 @media (prefers-reduced-motion: reduce) {
   .mascot { animation: none; }
   .mini-ball, .pop-in, .flash, .celebrate, .celebrate circle, .celebrate path { animation: none; }
@@ -1582,25 +1581,15 @@ function celebrate() {
   const close = () => el.remove(); el.onclick = close; setTimeout(close, RM() ? 1600 : 2600);
   if (!RM()) setTimeout(() => { const r = spot(el.querySelector("svg")); confetti(r.x, r.y, 46); }, 750);
 }
-// Opening the bill page: one coin splits and flies to every name, each amount counts up from 0, then the mascot cheers.
+// Opening the bill page: the total counts up, then the mascot cheers.
 function countUp(el, to, dur, fmt) { const t0 = performance.now(); (function f(t) { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(to * e); if (p < 1) requestAnimationFrame(f); else el.textContent = fmt(to); })(t0); }
 function billIntro() {
   billFx.on = false;
-  const hero = $("bill-hero"), amts = [...document.querySelectorAll("#content .person .amt")], mascot = document.querySelector("#content .bill-hero .mascot");
+  const hero = $("bill-hero"), mascot = document.querySelector("#content .bill-hero .mascot");
   if (!hero) return;
   countUp(hero, +hero.dataset.v, 900, rp);
-  amts.forEach(a => a.textContent = rb(0));
-  const o = spot(hero), host = screenEl(); let left = amts.length;
-  const done = () => { if (!mascot) return; mascot.className = "mascot m-cheer"; setTimeout(() => { if (mascot.isConnected) mascot.className = "mascot m-breath"; }, 2600); };
-  if (!left) return done();
-  amts.forEach((a, i) => {
-    const t = spot(a), c = document.createElement("span"); c.className = "coin"; c.style.left = (o.x - 9) + "px"; c.style.top = (o.y - 9) + "px"; host.appendChild(c);
-    const dx = t.x - o.x, dy = t.y - o.y, mx = dx * .5 + (i % 2 ? -36 : 36), my = Math.min(dy * .4, dy - 50) - 30;
-    c.animate([{ transform: "translate(0,0) scale(.4)" }, { transform: `translate(${mx}px,${my}px) scale(1.1) rotate(200deg)`, offset: .45 }, { transform: `translate(${dx}px,${dy}px) scale(.8) rotate(400deg)` }],
-      { duration: 650, delay: 250 + i * 80, easing: "cubic-bezier(.4,0,.3,1)", fill: "backwards" }).onfinish = () => {
-      c.remove(); if (a.isConnected) countUp(a, +a.dataset.v, 550, rb); if (!--left) done();
-    };
-  });
+  // Only the total counts up; each person's amount shows straight away. The mascot cheers when the total lands.
+  setTimeout(() => { if (!mascot || !mascot.isConnected) return; mascot.className = "mascot m-cheer"; setTimeout(() => { if (mascot.isConnected) mascot.className = "mascot m-breath"; }, 2600); }, 900);
 }
 
 // ---------- Bill photo: read food items and prices on the phone (Tesseract.js OCR) ----------
